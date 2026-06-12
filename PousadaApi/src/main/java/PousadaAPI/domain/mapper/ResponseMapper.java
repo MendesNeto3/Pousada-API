@@ -15,7 +15,6 @@ import org.mapstruct.Mapper;
         }
 )
 public interface ResponseMapper {
-
   ResponseDto toDto(Reserva reserva);
 
   Hospede toDTO (ResponseDto responseDto );
