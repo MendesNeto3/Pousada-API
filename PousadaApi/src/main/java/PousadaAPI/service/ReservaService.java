@@ -32,10 +32,12 @@ public class ReservaService {
     
     public Object criarReserva(CriarReservasRequestDto dto) {
         Hospede hospede = repositoryH.findById(dto.hospedeId())
-                .orElseThrow(() -> new HospedeNaoEncontradoException("Hóspede não foi encontrado"));
+                .orElseThrow(() ->
+                        new HospedeNaoEncontradoException("Hóspede não foi encontrado"));
 
         Quarto quarto = repositoryQ.findById(dto.quartoId())
-                .orElseThrow(() -> new QuartoNaoEncontradoException("O Quarto não foi encontrado"));
+                .orElseThrow(() ->
+                        new QuartoNaoEncontradoException("O Quarto não foi encontrado"));
 
         StatusQuarto status = StatusQuarto.valueOf(dto.status().toString().toUpperCase());
 

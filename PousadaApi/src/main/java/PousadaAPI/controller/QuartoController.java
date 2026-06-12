@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -61,8 +60,7 @@ public class QuartoController {
     public ResponseEntity<Object> listarQuartosDisponiveis(
             @RequestParam(value = "checkin", required = false) LocalDate checkin,
             @RequestParam(value = "checkout", required = false) LocalDate checkout
-    ) {
-        List<Quarto> resultadoLista = quartoService.listarDisponiveis(checkin, checkout);
+    ) { List<Quarto> resultadoLista = quartoService.listarDisponiveis(checkin, checkout);
         List<QuartoDTO> lista = resultadoLista
                 .stream()
                 .map(quartoMapper::toDto)

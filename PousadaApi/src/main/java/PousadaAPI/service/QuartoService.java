@@ -73,7 +73,8 @@ public class QuartoService {
         Quarto quarto = repository.findById(id)
                 .orElseThrow(()
                         -> new  QuartoNaoEncontradoException(
-                                "O quarto não foi encontrado"));
+                                "O quarto não foi encontrado")
+                );
         return repository.delete(quarto);
     }
 }

@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ public class HospedeService {
     private final HospedeRepository repository;
     private final HospedeMapper mapper;
     private final ResponseMapper responseMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public Object salvarHospede(Hospede hospede) {
         if (repository.existsByCpf(hospede.getCpf())) {
@@ -87,7 +89,6 @@ public class HospedeService {
                         new HospedeNaoEncontradoException(
                                 "O hóspede não foi encontrado."
                         ));
-
         if (dto.nome() == null || dto.nome().isEmpty() ||
             dto.telefone() == null || dto.telefone().isEmpty() ||
             dto.cpf() == null || dto.cpf().isEmpty() ||
