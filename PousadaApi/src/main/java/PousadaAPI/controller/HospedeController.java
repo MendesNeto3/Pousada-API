@@ -23,8 +23,7 @@ import java.util.UUID;
 @RequestMapping("/hospede")
 @RestController
 @AllArgsConstructor
-public class HospedeController {
-
+public class HospedeController { 
     private final HospedeService service;
     private final HospedeMapper mapper;
     private final ResponseMapper responseMapper;

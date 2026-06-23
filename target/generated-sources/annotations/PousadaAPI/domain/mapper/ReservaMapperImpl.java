@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-05-26T20:28:21-0300",
+    date = "2026-06-23T16:36:22-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.11 (Oracle Corporation)"
 )
 @Component
@@ -35,6 +35,7 @@ public class ReservaMapperImpl implements ReservaMapper {
         if ( dto != null ) {
             reserva.setCheckin( dto.checkin() );
             reserva.setCheckout( dto.checkout() );
+            reserva.setStatus( dto.status() );
         }
         reserva.setHospede( hospede );
         reserva.setQuarto( quarto );

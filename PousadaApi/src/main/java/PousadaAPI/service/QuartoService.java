@@ -69,13 +69,13 @@ public class QuartoService {
         return repository.listarReservasAtivas(Checkin, Checkout);
     }
 
-    public Object excluirQuarto (UUID id) {
-        Quarto quarto = repository.findById(id)
-                .orElseThrow(()
-                        -> new  QuartoNaoEncontradoException(
-                                "O quarto não foi encontrado")
-                );
-        return repository.delete(quarto);
+    public Quarto excluirQuarto (String id) {
+        var idQuarto = UUID.fromString(id);
+        Quarto quarto = repository.findById(idQuarto)
+                .orElseThrow(() ->
+                        new QuartoNaoEncontradoException("O quarto não foi encontrado"));
+        repository.delete(quarto);
+        return quarto;
     }
 }
 

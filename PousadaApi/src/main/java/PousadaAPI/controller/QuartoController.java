@@ -50,8 +50,7 @@ public class QuartoController {
     }
 
     @PatchMapping
-    public ResponseEntity<Object> atualizarQuarto
-            (@PathVariable("id") String id, @RequestBody @Valid QuartoDTO dto) {
+    public ResponseEntity<Object> atualizarQuarto (@RequestBody @Valid QuartoDTO dto) {
         var responseAtualizado = quartoService.atualizarStatusQuarto(dto);
         return ResponseEntity.ok(responseAtualizado);
     }
@@ -60,18 +59,18 @@ public class QuartoController {
     public ResponseEntity<Object> listarQuartosDisponiveis(
             @RequestParam(value = "checkin", required = false) LocalDate checkin,
             @RequestParam(value = "checkout", required = false) LocalDate checkout
-    ) { List<Quarto> resultadoLista = quartoService.listarDisponiveis(checkin, checkout);
-        List<QuartoDTO> lista = resultadoLista
-                .stream()
-                .map(quartoMapper::toDto)
+    ) {
+        List<Quarto> quartoList = quartoService.listarDisponiveis(checkin, checkout);
+        List<QuartoDTO> dtoList = quartoList
+                .stream().map(quartoMapper::toDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(lista);
+        return ResponseEntity.ok(dtoList);
     }
 
     @DeleteMapping
     public ResponseEntity<Object> deletarQuarto (@PathVariable String id) {
         var idQuarto = UUID.fromString(id);
-        Quarto quarto = (Quarto) quartoService.excluirQuarto(idQuarto);
+        Quarto quarto = quartoService.excluirQuarto(idQuarto.toString());
         ResponseDto responseQuarto = mapper.toResponse(quarto);
 
         return ResponseEntity.ok(responseQuarto);

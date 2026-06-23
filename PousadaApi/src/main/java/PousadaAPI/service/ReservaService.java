@@ -1,14 +1,13 @@
 package PousadaAPI.service;
 import PousadaAPI.domain.enums.StatusQuarto;
-import PousadaAPI.domain.exception.HorarioChegadaInvalidoException;
-import PousadaAPI.domain.exception.HospedeNaoEncontradoException;
-import PousadaAPI.domain.exception.QuartoNaoEncontradoException;
-import PousadaAPI.domain.exception.ReservaNaoDisponivelException;
+import PousadaAPI.domain.enums.StatusReserva;
+import PousadaAPI.domain.exception.*;
 import PousadaAPI.domain.mapper.ReservaMapper;
 import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.domain.model.Reserva;
+import PousadaAPI.dto.dtoEntity.reservaDTO;
 import PousadaAPI.dto.request.CriarReservasRequestDto;
 import PousadaAPI.repository.HospedeRepository;
 import PousadaAPI.repository.QuartoRepository;
@@ -17,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -58,5 +59,22 @@ public class ReservaService {
         return responseMapper.toDto(reserva);
     }
 
+    public Object realizarCheckin (Reserva reserva) {
+         Reserva reservaId = repositoryR.findById(reserva.getId())
+                 .orElseThrow(()
+                         -> new ReservaNaoEncontradaException
+                         ("A reserva com este respectivo identificador não foi encontrada"));
+
+        if (!StatusReserva.confirmada.equals(reserva.getStatus())) {
+            throw new ReservaJaRealizadaException("Check-in não permitido.");
+        }
+        if (LocalDate.now().isBefore(reserva.getCheckin())) {
+            throw new CheckinAntecipadoException("Não é permitido check-in antecipado.");
+        }
+        reserva.setStatusReserva(StatusReserva.checkin_realizado);
+        reserva.setStatus(StatusQuarto.ocupado);
+
+        return responseMapper.toDto(repositoryR.save(reservaId));
+    }
 }
 

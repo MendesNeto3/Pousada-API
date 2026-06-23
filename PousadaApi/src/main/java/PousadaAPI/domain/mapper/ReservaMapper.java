@@ -23,6 +23,7 @@ public interface ReservaMapper {
     @Mapping(target = "quarto",       source = "quarto")
     @Mapping(target = "funcionario",  ignore = true)
     @Mapping(target = "valorTotal",   ignore = true)
+    @Mapping(target = "status",       source = "dto.status")
     Reserva toEntity(CriarReservasRequestDto dto, Hospede hospede, Quarto quarto);
 
     ResponseDto toDto(Reserva reservaSalva);

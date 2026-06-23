@@ -6,5 +6,4 @@ public enum StatusReserva {
     checkout_realizado,
     cancelada;
 
-
 }

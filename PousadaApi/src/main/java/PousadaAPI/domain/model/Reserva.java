@@ -1,5 +1,7 @@
 package PousadaAPI.domain.model;
 
+import PousadaAPI.domain.enums.StatusQuarto;
+import PousadaAPI.domain.enums.StatusReserva;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.FutureOrPresent;
 import lombok.AllArgsConstructor;
@@ -44,5 +46,9 @@ public class Reserva {
     @JoinColumn(name = "quarto_id", nullable = false)
     private Quarto quarto;
 
+
+    private StatusQuarto status;
+
+    private StatusReserva statusReserva;
 
 }
