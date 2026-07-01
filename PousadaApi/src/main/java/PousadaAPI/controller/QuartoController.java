@@ -62,7 +62,8 @@ public class QuartoController {
     ) {
         List<Quarto> quartoList = quartoService.listarDisponiveis(checkin, checkout);
         List<QuartoDTO> dtoList = quartoList
-                .stream().map(quartoMapper::toDto)
+                .stream()
+                .map(quartoMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtoList);
     }

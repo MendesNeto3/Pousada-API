@@ -1,9 +1,11 @@
 package PousadaAPI.domain.mapper;
 
 import PousadaAPI.domain.model.Hospede;
+import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.dto.dtoEntity.HospedeDTO;
+import PousadaAPI.dto.dtoEntity.PagamentoDTO;
 import PousadaAPI.dto.request.CriarQuartoRequestDto;
 import PousadaAPI.dto.response.ResponseDto;
 import org.mapstruct.Mapper;
@@ -26,4 +28,6 @@ public interface ResponseMapper {
   ResponseDto toResponse (Quarto quarto);
 
   Quarto  toDTO(CriarQuartoRequestDto dto);
+
+  Pagamento toDTO (Pagamento pagamento);
 }
