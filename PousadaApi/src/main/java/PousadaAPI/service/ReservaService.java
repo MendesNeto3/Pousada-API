@@ -74,14 +74,5 @@ public class ReservaService {
         return responseMapper.toDto(repositoryR.save(reservaId));
     }
 
-    public Object realizarCheckout (Reserva reserva) {
-        Reserva reservaId = repositoryR.findById(reserva.getId())
-                .orElseThrow(() ->
-                        new ReservaNaoEncontradaException("A reserva com este respectivo identificador não foi encontrada"));
-        if (!StatusReserva.confirmada.equals(reserva.getStatus())) {
-            throw new ReservaNaoDisponivelException("A reserva não foi realizada com sucesso!");
-        }
-
-    }
 }
 

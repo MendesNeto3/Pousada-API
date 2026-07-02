@@ -2,9 +2,7 @@ package PousadaAPI.controller;
 
 import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Pagamento;
-import PousadaAPI.dto.dtoEntity.HospedeDTO;
-import PousadaAPI.dto.dtoEntity.PagamentoDTO;
-import PousadaAPI.dto.response.ResponseDto;
+import PousadaAPI.repository.ReservaRepository;
 import PousadaAPI.service.PagamentoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,10 +17,18 @@ public class PagamentoController {
 
     private final PagamentoService pagamentoService;
     private final ResponseMapper responseMapper;
+    private final ReservaRepository reservaRepository;
 
     @PostMapping
-    public ResponseEntity<Pagamento> registrarPagamento (@RequestBody @Valid String id) {
-        Pagamento pagamento = pagamentoService.registrarPagamento(id);
+    public ResponseEntity<Pagamento> registrarPagamento (@RequestBody @Valid String ReservaId) {
+        Pagamento pagamento = pagamentoService.registrarPagamento(ReservaId);
+        Pagamento responseDto = responseMapper.toDTO(pagamento);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Pagamento> removerPagamento (@RequestBody @Valid String ReservaId) {
+        Pagamento pagamento = (Pagamento) pagamentoService.excluirPagamento(ReservaId);
         Pagamento responseDto = responseMapper.toDTO(pagamento);
         return ResponseEntity.ok(responseDto);
     }

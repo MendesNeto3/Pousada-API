@@ -65,4 +65,12 @@ public class PagamentoService {
 
         return reserva.getValorTotal().subtract(pagamentoTotal);
     }
+
+    public Object excluirPagamento (String reservaId) {
+        Reserva reserva = reservaRepository.findById(reservaId)
+                .orElseThrow(()->
+                        new ReservaNaoEncontradaException("Reserva não encontrada."));
+        reservaRepository.delete(reserva);
+        return responseMapper.toDto(reserva);
+    }
 }

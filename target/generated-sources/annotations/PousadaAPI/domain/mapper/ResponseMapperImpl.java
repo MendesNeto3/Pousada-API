@@ -1,6 +1,7 @@
 package PousadaAPI.domain.mapper;
 
 import PousadaAPI.domain.model.Hospede;
+import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.dto.dtoEntity.HospedeDTO;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-23T16:36:22-0300",
+    date = "2026-07-01T19:49:33-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.11 (Oracle Corporation)"
 )
 @Component
@@ -120,5 +121,22 @@ public class ResponseMapperImpl implements ResponseMapper {
         quarto.setPrecoNoite( dto.precoNoite() );
 
         return quarto;
+    }
+
+    @Override
+    public Pagamento toDTO(Pagamento pagamento) {
+        if ( pagamento == null ) {
+            return null;
+        }
+
+        Pagamento pagamento1 = new Pagamento();
+
+        pagamento1.setId( pagamento.getId() );
+        pagamento1.setReserva( pagamento.getReserva() );
+        pagamento1.setValor( pagamento.getValor() );
+        pagamento1.setPagamento( pagamento.getPagamento() );
+        pagamento1.setStatusPagamento( pagamento.getStatusPagamento() );
+
+        return pagamento1;
     }
 }
