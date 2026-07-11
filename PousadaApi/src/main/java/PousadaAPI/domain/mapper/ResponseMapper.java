@@ -10,6 +10,8 @@ import PousadaAPI.dto.request.CriarQuartoRequestDto;
 import PousadaAPI.dto.response.ResponseDto;
 import org.mapstruct.Mapper;
 
+import java.math.BigDecimal;
+
 @Mapper(componentModel = "spring",
         uses = {
                 HospedeMapper.class,
@@ -19,15 +21,11 @@ import org.mapstruct.Mapper;
 public interface ResponseMapper {
   ResponseDto toDto(Reserva reserva);
 
-  Hospede toDTO (ResponseDto responseDto );
-
-  HospedeDTO toResponse (ResponseDto responseDto);
-
   ResponseDto toResponse (Hospede hospede);
 
   ResponseDto toResponse (Quarto quarto);
 
-  Quarto  toDTO(CriarQuartoRequestDto dto);
-
   Pagamento toDTO (Pagamento pagamento);
+
+  Pagamento toDTO(BigDecimal saldoAberto);
 }

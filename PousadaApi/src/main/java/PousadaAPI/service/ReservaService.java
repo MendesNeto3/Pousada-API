@@ -1,55 +1,52 @@
 package PousadaAPI.service;
+import PousadaAPI.domain.enums.StatusPagamento;
 import PousadaAPI.domain.enums.StatusQuarto;
 import PousadaAPI.domain.enums.StatusReserva;
 import PousadaAPI.domain.exception.*;
 import PousadaAPI.domain.mapper.ReservaMapper;
 import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Hospede;
+import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.dto.request.CriarReservasRequestDto;
 import PousadaAPI.repository.HospedeRepository;
+import PousadaAPI.repository.PagamentoRepository;
 import PousadaAPI.repository.QuartoRepository;
 import PousadaAPI.repository.ReservaRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
 @AllArgsConstructor
 @Data
 public class ReservaService {
-
     private final ReservaRepository repositoryR;
     private final HospedeRepository repositoryH;
     private final ReservaMapper mapper;
     private final ResponseMapper responseMapper;
     private final QuartoRepository repositoryQ;
-
+    private final PagamentoRepository pagamentoRepository;
     
     public Object criarReserva(CriarReservasRequestDto dto) {
         Hospede hospede = repositoryH.findById(dto.hospedeId())
                 .orElseThrow(() ->
                         new HospedeNaoEncontradoException("Hóspede não foi encontrado"));
-
         Quarto quarto = repositoryQ.findById(dto.quartoId())
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O Quarto não foi encontrado"));
-
         StatusQuarto status = StatusQuarto.valueOf(dto.status().toString().toUpperCase());
-
         if (status == StatusQuarto.ocupado ||
             status == StatusQuarto.limpeza ||
             status == StatusQuarto.reservado) {
-
             throw new ReservaNaoDisponivelException("O quarto não está disponível no momento.");
         }
-
         if (LocalDate.now().isAfter(dto.checkin())) {
             throw new HorarioChegadaInvalidoException("A data de check-in não pode ser anterior a hoje.");
         }
-
         Reserva reserva = mapper.toEntity(dto, hospede, quarto);
         reserva = repositoryR.save(reserva);
 
@@ -73,6 +70,29 @@ public class ReservaService {
 
         return responseMapper.toDto(repositoryR.save(reservaId));
     }
+
+    public Object realizarCheckOut (Reserva reserva) {
+        Reserva reservaid = repositoryR.findById(reserva.getId())
+                .orElseThrow(()
+                        -> new ReservaNaoEncontradaException("A reserva com este respectivio indentificador não foi encontrada."));
+        if (StatusReserva.checkin_realizado.equals(reserva.getStatus())) {
+            throw new CheckinNaoRealizadoException ("O Checkin da respectiva reserva não foi realizado.");
+        }
+        BigDecimal totalPago = pagamentoRepository
+                .findByStatusPagamento(StatusPagamento.aprovado)
+                .stream()
+                .map(Pagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (totalPago.compareTo(reserva.getValorTotal()) < 0 ) {
+            BigDecimal saldoEmAberto = reserva.getValorTotal().subtract(totalPago);
+            throw new CheckoutIndisponivelException
+                    ("Não é possívfel realizar o checkout, existe um valor em aberto.");
+        }
+        reserva.setStatusReserva(StatusReserva.checkout_realizado);
+        return responseMapper.toDto(repositoryR.save(reservaid));
+    }
+
+
 
 }
 

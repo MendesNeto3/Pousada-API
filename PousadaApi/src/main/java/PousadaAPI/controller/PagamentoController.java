@@ -1,14 +1,19 @@
 package PousadaAPI.controller;
 
+import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.repository.ReservaRepository;
 import PousadaAPI.service.PagamentoService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.net.URI;
 
 @Controller
 @RestController
@@ -17,13 +22,21 @@ public class PagamentoController {
 
     private final PagamentoService pagamentoService;
     private final ResponseMapper responseMapper;
-    private final ReservaRepository reservaRepository;
+    private final URIConfig config;
 
     @PostMapping
     public ResponseEntity<Pagamento> registrarPagamento (@RequestBody @Valid String ReservaId) {
         Pagamento pagamento = pagamentoService.registrarPagamento(ReservaId);
         Pagamento responseDto = responseMapper.toDTO(pagamento);
-        return ResponseEntity.ok(responseDto);
+        URI location = config.criarUriLocation(responseDto);
+        return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Pagamento> calcularSaldoAberto (@RequestParam @Valid String ReservaId) {
+        BigDecimal saldoAberto = pagamentoService.CalcularSaldoAberto(ReservaId);
+        Pagamento responseDTO = responseMapper.toDTO(saldoAberto);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping

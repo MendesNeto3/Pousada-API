@@ -11,6 +11,7 @@ import PousadaAPI.dto.response.dtoHospedePesquisa;
 import PousadaAPI.repository.HospedeRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 @Data
+@Slf4j
 public class HospedeService {
 
     private final HospedeRepository repository;
@@ -31,6 +33,7 @@ public class HospedeService {
 
     public Object salvarHospede(Hospede hospede) {
         if (repository.existsByCpf(hospede.getCpf())) {
+            log.error("Erro ao cadastrar o usuário.");
             throw new RegistroDuplicadoException("Este CPF já foi cadastrado.");
         } else if (repository.existsByEmail(hospede.getEmail())) {
             throw new RegistroDuplicadoException("Esté email já foi registrado.");
@@ -98,7 +101,6 @@ public class HospedeService {
                     "Os dados inseridos são inválidos."
             );
         }
-
         hospede.setNome(dto.nome());
         hospede.setTelefone(dto.telefone());
         hospede.setCpf(dto.cpf());

@@ -53,12 +53,12 @@ public class PagamentoService {
         return pagamentoRepository.save(pagamentoDTO);
     }
 
-    public Object CalcularSaldoAberto (String reservaId) {
+    public BigDecimal CalcularSaldoAberto (String reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(()->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
         BigDecimal pagamentoTotal = pagamentoRepository
-                .findByReservaIdAndStatusPagamento(StatusPagamento.aprovado, reservaId)
+                .findByStatusPagamento(StatusPagamento.aprovado)
                 .stream()
                 .map(Pagamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -70,7 +70,6 @@ public class PagamentoService {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(()->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
-        reservaRepository.delete(reserva);
         return responseMapper.toDto(reserva);
     }
 }

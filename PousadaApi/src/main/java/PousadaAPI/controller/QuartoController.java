@@ -1,5 +1,6 @@
 package PousadaAPI.controller;
 
+import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.exception.CadastroIndisponivelException;
 import PousadaAPI.domain.mapper.QuartoMapper;
 import PousadaAPI.domain.mapper.ResponseMapper;
@@ -28,25 +29,15 @@ public class QuartoController {
     private final QuartoService quartoService;
     private final QuartoMapper quartoMapper;
     private final ResponseMapper mapper;
+    private final URIConfig  uriConfig;
 
     @PostMapping
     public ResponseEntity<?> cadastrarQuarto(
             @RequestBody @Valid CriarQuartoRequestDto quartoRequestDto) {
-        try {
-            Quarto quarto = (Quarto) quartoService.cadastrarQuarto(quartoRequestDto);
-            ResponseDto responseQuarto = mapper.toResponse(quarto);
-
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(quarto.getId())
-                    .toUri();
-
-            return ResponseEntity.created(location).body(responseQuarto);
-        } catch (CadastroIndisponivelException e) {
-            var erro = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erro.status()).body(erro);
-        }
+         Quarto quarto = (Quarto) quartoService.cadastrarQuarto(quartoRequestDto);
+         ResponseDto responseQuarto = mapper.toResponse(quarto);
+         URI location = uriConfig.criarUriLocation(responseQuarto);
+         return ResponseEntity.created(location).build();
     }
 
     @PatchMapping
@@ -73,7 +64,6 @@ public class QuartoController {
         var idQuarto = UUID.fromString(id);
         Quarto quarto = quartoService.excluirQuarto(idQuarto.toString());
         ResponseDto responseQuarto = mapper.toResponse(quarto);
-
         return ResponseEntity.ok(responseQuarto);
     }
 }

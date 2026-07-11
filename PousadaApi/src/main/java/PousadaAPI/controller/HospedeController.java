@@ -1,4 +1,5 @@
 package PousadaAPI.controller;
+import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.exception.CadastroIndisponivelException;
 import PousadaAPI.domain.exception.HospedeNaoEncontradoException;
 import PousadaAPI.domain.exception.RegistroDuplicadoException;
@@ -15,7 +16,6 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
@@ -27,28 +27,15 @@ public class HospedeController {
     private final HospedeService service;
     private final HospedeMapper mapper;
     private final ResponseMapper responseMapper;
+    private final URIConfig config;
 
     @PostMapping
     public ResponseEntity<Object> cadastrarHospede(@RequestBody @Valid CriarHospedeRequestDto dto) {
-        try {
             Hospede hospede = mapper.toEntity(dto);
             Hospede salvo = (Hospede) service.salvarHospede(hospede);
             ResponseDto response = responseMapper.toResponse(salvo);
-
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(response.hospede().id())
-                    .toUri();
-
+            URI location = config.criarUriLocation(response.hospede().id());
             return ResponseEntity.created(location).body(response);
-        } catch (CadastroIndisponivelException e) {
-            var erro = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erro.status()).body(erro);
-        } catch (RegistroDuplicadoException e) {
-            var error = dtoErroResposta.conflito(e.getMessage());
-            return ResponseEntity.status(error.status()).body(error);
-        }
     }
 
     @GetMapping("/buscar")
@@ -64,31 +51,16 @@ public class HospedeController {
 
     @GetMapping("{id}")
     public ResponseEntity<Object> procurarPorID(@PathVariable("id") String id) {
-        try {
             var idHospede = UUID.fromString(id);
             ResponseDto hospede = service.buscarPorID(idHospede);
-
             return ResponseEntity.ok(hospede);
-        }catch (HospedeNaoEncontradoException e){
-            var erro = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erro.status()).body(erro);
-        }
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Object> deletarHospede(@PathVariable("id") String id) {
-        try {
             var idHospede = UUID.fromString(id);
             Object hospedeDeletado = service.deletarHospede(idHospede);
-
             return ResponseEntity.ok(hospedeDeletado);
-
-        } catch (HospedeNaoEncontradoException e){
-            var erro = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erro.status()).body(erro);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Formado de UUID inválido");
-        }
     }
 
     @GetMapping

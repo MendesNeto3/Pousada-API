@@ -1,4 +1,5 @@
 package PousadaAPI.controller;
+import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.exception.ReservaNaoDisponivelException;
 import PousadaAPI.domain.mapper.ReservaMapper;
 import PousadaAPI.domain.model.Reserva;
@@ -20,25 +21,15 @@ public class ReservaController {
 
     private final ReservaMapper mapper;
     private final ReservaService service;
+    private final URIConfig config;
 
     @PostMapping
     public ResponseEntity<Object> criarReserva(@RequestBody @Valid CriarReservasRequestDto dto) {
-        try {
-            Reserva reservaSalva = (Reserva) service.criarReserva(dto);
-            ResponseDto respostaDto = mapper.toDto(reservaSalva);
-
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(respostaDto)
-                    .toUri();
-
-            return ResponseEntity.created(location).body(respostaDto);
-        } catch (ReservaNaoDisponivelException e) {
-            var erroDto = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erroDto.status()).body(erroDto);
-        }
-    }
+        Reserva reservaSalva = (Reserva) service.criarReserva(dto);
+        ResponseDto respostaDto = mapper.toDto(reservaSalva);
+        URI location = config.criarUriLocation(respostaDto);
+        return ResponseEntity.created(location).build();
+      }
 
     @PatchMapping
     public ResponseEntity<Object> realizarCheckin(@RequestBody @Valid Reserva reserva) {
@@ -46,4 +37,9 @@ public class ReservaController {
         return ResponseEntity.ok(checkin);
     }
 
+    @PatchMapping
+    public ResponseEntity<Object> realizarCheckout (@RequestBody @Valid Reserva reserva) {
+        ResponseDto checkin = (ResponseDto) service.realizarCheckOut(reserva);
+        return ResponseEntity.ok(checkin);
+    }
 }
