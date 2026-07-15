@@ -33,7 +33,6 @@ public class HospedeService {
 
     public Object salvarHospede(Hospede hospede) {
         if (repository.existsByCpf(hospede.getCpf())) {
-            log.error("Erro ao cadastrar o usuário.");
             throw new RegistroDuplicadoException("Este CPF já foi cadastrado.");
         } else if (repository.existsByEmail(hospede.getEmail())) {
             throw new RegistroDuplicadoException("Esté email já foi registrado.");
@@ -76,44 +75,31 @@ public class HospedeService {
     }
 
     public Object buscarPorNome(String nome) {
-        if (nome == null || nome.isEmpty()) {
-            throw new HospedeNaoEncontradoException("O hóspede não foi encontrado.");
-        } else {
-            Hospede hospede = repository.findByNome(nome);
-             return mapper.toDTO(hospede);
-        }
+        return repository.findByNome(nome)
+                .filter(hospede -> hospede.getNome() != null && !hospede.getNome().isBlank())
+                .map(responseMapper::toResponse)
+                .orElseThrow(() ->
+                        new HospedeNaoEncontradoException("O hóspede não possui um nome válido ou não foi encontrado."));
     }
 
     public ResponseDto atualizar(HospedeDTO dto, String id) {
-        UUID idHospede = UUID.fromString(id);
-        Hospede hospede = repository
-                .findById(idHospede)
+       dto.validar();
+        return repository
+                .findById(UUID.fromString(id))
+                .map(hospede -> {
+                    hospede.setNome(dto.nome());
+                    hospede.setTelefone(dto.telefone());
+                    hospede.setCpf(dto.cpf());
+                    hospede.setEmail(dto.email());
+                    return repository.save(hospede);
+                })
+                .map(responseMapper::toResponse)
                 .orElseThrow(() ->
-                        new HospedeNaoEncontradoException(
-                                "O hóspede não foi encontrado."
-                        ));
-        if (dto.nome() == null || dto.nome().isEmpty() ||
-            dto.telefone() == null || dto.telefone().isEmpty() ||
-            dto.cpf() == null || dto.cpf().isEmpty() ||
-            dto.email() == null || dto.email().isEmpty()) {
-
-            throw new DadosInvalidosException(
-                    "Os dados inseridos são inválidos."
-            );
-        }
-        hospede.setNome(dto.nome());
-        hospede.setTelefone(dto.telefone());
-        hospede.setCpf(dto.cpf());
-        hospede.setEmail(dto.email());
-
-        Hospede hospedeAtualizado = repository.save(hospede);
-
-        return responseMapper.toResponse(hospedeAtualizado);
+                        new HospedeNaoEncontradoException("O hóspede não foi encontrado."));
     }
 
     public ResponseDto obterDetalhes(UUID id) {
         Optional<Hospede> hospede = repository.findById(id);
-
         if (hospede.isEmpty()) {
             new HospedeNaoEncontradoException("Hospede não foi encontrado.");
         }

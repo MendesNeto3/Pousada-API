@@ -1,4 +1,5 @@
 package PousadaAPI.service;
+import PousadaAPI.domain.enums.MetodoPagamento;
 import PousadaAPI.domain.enums.StatusPagamento;
 import PousadaAPI.domain.exception.PagamentoNaoEncontradoException;
 import PousadaAPI.domain.exception.ReservaNaoEncontradaException;
@@ -11,7 +12,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -71,5 +75,10 @@ public class PagamentoService {
                 .orElseThrow(()->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
         return responseMapper.toDto(reserva);
+    }
+    public List<Pagamento> listaPagamento(String reservaId, StatusPagamento  statusPagamento) {
+        return pagamentoRepository
+                .findByReservaIdAndStatusPagamento
+                        (reservaId, statusPagamento.equals(StatusPagamento.aprovado));
     }
 }

@@ -31,13 +31,13 @@ public class ReservaController {
         return ResponseEntity.created(location).build();
       }
 
-    @PatchMapping
+    @PatchMapping("/checkin")
     public ResponseEntity<Object> realizarCheckin(@RequestBody @Valid Reserva reserva) {
         ResponseDto checkin = (ResponseDto) service.realizarCheckin(reserva);
         return ResponseEntity.ok(checkin);
     }
 
-    @PatchMapping
+    @PatchMapping("/checkout")
     public ResponseEntity<Object> realizarCheckout (@RequestBody @Valid Reserva reserva) {
         ResponseDto checkin = (ResponseDto) service.realizarCheckOut(reserva);
         return ResponseEntity.ok(checkin);

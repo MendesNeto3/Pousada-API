@@ -1,12 +1,6 @@
 package PousadaAPI.domain.mapper;
 
-import PousadaAPI.domain.model.Hospede;
-import PousadaAPI.domain.model.Pagamento;
-import PousadaAPI.domain.model.Quarto;
-import PousadaAPI.domain.model.Reserva;
-import PousadaAPI.dto.dtoEntity.HospedeDTO;
-import PousadaAPI.dto.dtoEntity.PagamentoDTO;
-import PousadaAPI.dto.request.CriarQuartoRequestDto;
+import PousadaAPI.domain.model.*;
 import PousadaAPI.dto.response.ResponseDto;
 import org.mapstruct.Mapper;
 
@@ -28,4 +22,6 @@ public interface ResponseMapper {
   Pagamento toDTO (Pagamento pagamento);
 
   Pagamento toDTO(BigDecimal saldoAberto);
+
+  Funcionario toResponse(Funcionario funcionario);
 }

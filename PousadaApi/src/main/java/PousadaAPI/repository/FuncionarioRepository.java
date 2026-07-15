@@ -9,7 +9,9 @@ import java.util.UUID;
 
 @Repository
 public interface FuncionarioRepository extends JpaRepository <Funcionario, UUID> {
-
     Optional<Funcionario> findByEmail(String email);
+    boolean existsByEmail(String email);
+    boolean existsByName(String name);
 
+    Funcionario delete(Funcionario responseDto);
 }

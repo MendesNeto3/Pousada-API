@@ -2,6 +2,8 @@ package PousadaAPI.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@Builder
 @AllArgsConstructor
 @Entity
 @NoArgsConstructor
@@ -37,6 +40,9 @@ public class Funcionario implements UserDetails {
     @Transient
     @Column(name = "ativo", nullable = false)
     private boolean ativo;
+
+    public Funcionario(@NotBlank(message = "O e-mail é obrigatório.") @Email(message = "O e-mail inserido é inválido.") String email, @NotBlank(message = "A senha é obrigatória.") @Size(min = 6, message = "A senha deve conter no mínimo 6 caracteres.") String senha) {
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

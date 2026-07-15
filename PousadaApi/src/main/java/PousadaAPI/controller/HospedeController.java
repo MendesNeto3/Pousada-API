@@ -1,15 +1,11 @@
 package PousadaAPI.controller;
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.exception.CadastroIndisponivelException;
-import PousadaAPI.domain.exception.HospedeNaoEncontradoException;
-import PousadaAPI.domain.exception.RegistroDuplicadoException;
 import PousadaAPI.domain.mapper.HospedeMapper;
 import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.dto.dtoEntity.HospedeDTO;
 import PousadaAPI.dto.request.CriarHospedeRequestDto;
 import PousadaAPI.dto.response.ResponseDto;
-import PousadaAPI.dto.response.dtoErroResposta;
 import PousadaAPI.dto.response.dtoHospedePesquisa;
 import PousadaAPI.service.HospedeService;
 import jakarta.validation.Valid;
@@ -40,13 +36,8 @@ public class HospedeController {
 
     @GetMapping("/buscar")
     public ResponseEntity<Object> procurarPorNome(@PathVariable String nome) {
-        try {
             Hospede hospede = (Hospede) service.buscarPorNome(nome);
             return ResponseEntity.ok(mapper.toDTO(hospede));
-        } catch (HospedeNaoEncontradoException e) {
-            var erro = dtoErroResposta.respostapadrao(e.getMessage());
-            return ResponseEntity.status(erro.status()).body(erro);
-        }
     }
 
     @GetMapping("{id}")
@@ -64,7 +55,7 @@ public class HospedeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Hospede>> pesquisa(dtoHospedePesquisa filtros) {
+    public ResponseEntity<List<Hospede>> pesquisa(@RequestParam(value = "filtros", required = false) dtoHospedePesquisa filtros) {
         return ResponseEntity.ok(service.pesquisa(filtros));
     }
 

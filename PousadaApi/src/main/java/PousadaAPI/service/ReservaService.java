@@ -91,8 +91,5 @@ public class ReservaService {
         reserva.setStatusReserva(StatusReserva.checkout_realizado);
         return responseMapper.toDto(repositoryR.save(reservaid));
     }
-
-
-
 }
 

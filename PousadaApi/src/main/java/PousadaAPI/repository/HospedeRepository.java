@@ -16,7 +16,7 @@ public interface HospedeRepository extends JpaRepository<Hospede, UUID> {
 
     boolean existsByEmail(@NotBlank(message = "Email já está cadastrado") String dto);
 
-    Hospede findByNome(String nome);
+    Optional<Hospede> findByNome(String nome);
 
     Optional<Object> deleteById(ResponseDto id);
 

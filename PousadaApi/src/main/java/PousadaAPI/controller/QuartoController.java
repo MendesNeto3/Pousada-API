@@ -31,7 +31,7 @@ public class QuartoController {
     private final ResponseMapper mapper;
     private final URIConfig  uriConfig;
 
-    @PostMapping
+    @PostMapping("/cadastrar")
     public ResponseEntity<?> cadastrarQuarto(
             @RequestBody @Valid CriarQuartoRequestDto quartoRequestDto) {
          Quarto quarto = (Quarto) quartoService.cadastrarQuarto(quartoRequestDto);
@@ -40,13 +40,13 @@ public class QuartoController {
          return ResponseEntity.created(location).build();
     }
 
-    @PatchMapping
+    @PatchMapping("/atualizar")
     public ResponseEntity<Object> atualizarQuarto (@RequestBody @Valid QuartoDTO dto) {
         var responseAtualizado = quartoService.atualizarStatusQuarto(dto);
         return ResponseEntity.ok(responseAtualizado);
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public ResponseEntity<Object> listarQuartosDisponiveis(
             @RequestParam(value = "checkin", required = false) LocalDate checkin,
             @RequestParam(value = "checkout", required = false) LocalDate checkout
