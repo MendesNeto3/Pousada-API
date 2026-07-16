@@ -1,9 +1,11 @@
 package PousadaAPI.Security;
 
+import PousadaAPI.domain.model.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -14,9 +16,9 @@ public class JwtUtil  {
 
     private final String secretKey = "123457-891020";
 
-    public String generateToken(String username) {
+    public String generateToken(Usuario username) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
