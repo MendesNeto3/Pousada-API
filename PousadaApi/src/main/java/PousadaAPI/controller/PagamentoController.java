@@ -2,7 +2,7 @@ package PousadaAPI.controller;
 
 import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.enums.StatusPagamento;
-import PousadaAPI.domain.mapper.ResponseMapper;
+import PousadaAPI.domain.mapper.PagamentoMapper;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.service.PagamentoService;
 import jakarta.validation.Valid;
@@ -21,13 +21,13 @@ import java.util.List;
 public class PagamentoController {
 
     private final PagamentoService pagamentoService;
-    private final ResponseMapper responseMapper;
+    private final PagamentoMapper pagamentoMapper;
     private final URIConfig config;
 
     @PostMapping
     public ResponseEntity<Pagamento> registrarPagamento (@RequestBody @Valid String ReservaId) {
         Pagamento pagamento = pagamentoService.registrarPagamento(ReservaId);
-        Pagamento responseDto = responseMapper.toDTO(pagamento);
+        Pagamento responseDto = pagamentoMapper.toResponse(pagamento);
         URI location = config.criarUriLocation(responseDto);
         return ResponseEntity.created(location).build();
     }
@@ -35,21 +35,21 @@ public class PagamentoController {
     @GetMapping("/calcular")
     public ResponseEntity<Pagamento> calcularSaldoAberto (@RequestParam @Valid String ReservaId) {
         BigDecimal saldoAberto = pagamentoService.CalcularSaldoAberto(ReservaId);
-        Pagamento responseDTO = responseMapper.toDTO(saldoAberto);
+        Pagamento responseDTO = pagamentoMapper.toResponse(saldoAberto);
         return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping
-    public ResponseEntity<Pagamento> removerPagamento (@RequestBody @Valid String ReservaId) {
-        Pagamento pagamento = (Pagamento) pagamentoService.excluirPagamento(ReservaId);
-        Pagamento responseDto = responseMapper.toDTO(pagamento);
+    public ResponseEntity<Pagamento> cancelarPagamento (@RequestBody @Valid String ReservaId) {
+        Pagamento pagamento = pagamentoService.cancelarPagamentoExpirado(ReservaId);
+        Pagamento responseDto = pagamentoMapper.toResponse(pagamento);
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/pagamentosLista")
-    public ResponseEntity<List<Pagamento>> listaPagamentos (
-            @RequestParam @Valid String reservaId,
+    public ResponseEntity<List<Object>> listaPagamentos (
+            @RequestParam @Valid Pagamento pagamento,
             @RequestParam @Valid StatusPagamento saldoStatus) {
-        return ResponseEntity.ok(pagamentoService.listaPagamento(reservaId, saldoStatus));
+        return ResponseEntity.ok(pagamentoService.listaPagamento(pagamento));
     }
 }

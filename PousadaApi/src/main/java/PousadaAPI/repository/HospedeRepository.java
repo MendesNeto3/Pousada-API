@@ -1,7 +1,6 @@
 package PousadaAPI.repository;
 
 import PousadaAPI.domain.model.Hospede;
-import PousadaAPI.dto.response.ResponseDto;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,7 +17,4 @@ public interface HospedeRepository extends JpaRepository<Hospede, UUID> {
 
     Optional<Hospede> findByNome(String nome);
 
-    Optional<Object> deleteById(ResponseDto id);
-
-    Optional<Object> findById(String id);
 }

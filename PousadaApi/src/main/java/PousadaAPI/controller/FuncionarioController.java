@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RequestMapping("/funcionario")
 @RestController
 @AllArgsConstructor
@@ -19,7 +18,7 @@ public class FuncionarioController {
     private final FuncionarioService funcionarioService;
     private final URIConfig uriConfig;
 
-    @PostMapping()
+    @PostMapping("/cadastro")
     public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid CriarFuncionarioRequestDTO funcionarioRequestDTO) {
         Funcionario funcionario = funcionarioService.cadastrarFuncionario(funcionarioRequestDTO);
         var config = uriConfig.criarUriLocation(funcionario);
@@ -39,7 +38,7 @@ public class FuncionarioController {
         return ResponseEntity.ok(funcionarioService.listarFuncionario(nome, email));
     }
 
-    @PutMapping
+    @PutMapping("{id}")
     public ResponseEntity<Funcionario> atualizarDados
             (@PathVariable ("id") String id,
              @RequestBody CriarFuncionarioRequestDTO funcionarioRequestDTO) {

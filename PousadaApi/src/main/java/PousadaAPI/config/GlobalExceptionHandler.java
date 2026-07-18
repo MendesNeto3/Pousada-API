@@ -1,5 +1,4 @@
 package PousadaAPI.config;
-
 import PousadaAPI.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -48,9 +47,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({
             CadastroIndisponivelException.class,
             CheckinAntecipadoException.class,
+            CheckinNaoRealizadoException.class,
+            CheckoutIndisponivelException.class,
             DadosInvalidosException.class,
             DataInvalidaException.class,
             HorarioChegadaInvalidoException.class,
+            PagamentoDentroDoPrazoException.class,
             QuartoDisponivelException.class,
             QuartoIndisponivelException.class,
             ReservaNaoDisponivelException.class,
@@ -63,6 +65,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
         problemDetail.setTitle("Regra de negócio violada");
         problemDetail.setType(URI.create("https://api.seuhotel.com/errors/bad-request"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(LoginInvalidoException.class)
+    public ProblemDetail handleLoginInvalido(LoginInvalidoException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage()
+        );
+        problemDetail.setTitle("Falha de autenticação");
+        problemDetail.setType(URI.create("https://api.seuhotel.com/errors/unauthorized"));
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }

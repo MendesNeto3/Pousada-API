@@ -2,11 +2,9 @@ package PousadaAPI.service;
 
 import PousadaAPI.domain.enums.Role;
 import PousadaAPI.domain.exception.RegistroDuplicadoException;
-import PousadaAPI.domain.mapper.ResponseMapper;
+import PousadaAPI.domain.mapper.FuncionarioMapper;
 import PousadaAPI.domain.model.Funcionario;
-import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.domain.model.Usuario;
-import PousadaAPI.dto.dtoEntity.HospedeDTO;
 import PousadaAPI.dto.request.CriarFuncionarioRequestDTO;
 import PousadaAPI.repository.FuncionarioRepository;
 import lombok.AllArgsConstructor;
@@ -15,9 +13,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -28,13 +24,13 @@ public class FuncionarioService {
 
     private FuncionarioRepository funcionarioRepository;
     private BCryptPasswordEncoder passwordEncoder;
-    private  ResponseMapper mapper;
+    private FuncionarioMapper mapper;
 
     public Funcionario cadastrarFuncionario (CriarFuncionarioRequestDTO dto) {
         if (funcionarioRepository.existsByEmail(dto.email())) {
             throw new RegistroDuplicadoException("Já existe um funcionário com este email");
         }
-        if (funcionarioRepository.existsByName(dto.nome())) {
+        if (funcionarioRepository.existsByNome(dto.nome())) {
             throw new RegistroDuplicadoException("Este respectivo nome já está em uso");
         }
         Usuario usuario = Usuario.builder()
@@ -61,8 +57,9 @@ public class FuncionarioService {
         var funcionarioId = UUID.fromString(id);
         Funcionario funcionario = funcionarioRepository
                 .findById(funcionarioId)
-                .orElseThrow(() -> new UsernameNotFoundException("Funcionário não existente."));
-        return mapper.toResponse(funcionarioRepository.delete(funcionario));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Funcionário não existente."));
+        return funcionarioRepository.deletar(funcionario);
     }
 
     public List<Funcionario> listarFuncionario(String email, String nome) {

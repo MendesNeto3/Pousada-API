@@ -11,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table (name = "Hospede", schema = "public")

@@ -4,7 +4,7 @@ import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.dto.request.CriarReservasRequestDto;
-import PousadaAPI.dto.response.ResponseDto;
+import PousadaAPI.dto.response.ReservasResumoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -26,6 +26,6 @@ public interface ReservaMapper {
     @Mapping(target = "status",       source = "dto.status")
     Reserva toEntity(CriarReservasRequestDto dto, Hospede hospede, Quarto quarto);
 
-    ResponseDto toDto(Reserva reservaSalva);
+    ReservasResumoDTO toResponse (Reserva reservaSalva);
 
 }

@@ -1,13 +1,12 @@
-package PousadaAPI.dto.dtoEntity;
+package PousadaAPI.dto.response;
+
 import PousadaAPI.domain.exception.DadosInvalidosException;
 
-import java.util.UUID;
-
-public record HospedeDTO(
-        UUID id,
+public record HospedeResponse(
         String nome,
-        String telefone,
         String cpf,
+        String telefone,
+        String endereco,
         String email
 ) {
     public void validar() {
@@ -15,7 +14,8 @@ public record HospedeDTO(
             throw new DadosInvalidosException("Os dados inseridos são inválidos.");
         }
     }
-    public boolean isVazio (String valor) {
-        return valor == null | valor.isEmpty();
+    public boolean isVazio(String valor) {
+        return valor == null || valor.isBlank();
     }
 }
+

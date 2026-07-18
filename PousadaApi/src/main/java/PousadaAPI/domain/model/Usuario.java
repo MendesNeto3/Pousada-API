@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Usuario implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(unique = true, nullable = false)

@@ -2,6 +2,7 @@ package PousadaAPI.service;
 
 import PousadaAPI.Security.JwtUtil;
 import PousadaAPI.domain.model.Usuario;
+import PousadaAPI.dto.dtoEntity.LoginDTO;
 import PousadaAPI.dto.response.TokenResponseDTO;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,8 +14,8 @@ public class AutenticationService {
     private AuthenticationManager authentication;
     private JwtUtil  jwtUtil;
 
-    public TokenResponseDTO autenticar (String username, String password) {
-        var senhaUsuario = new UsernamePasswordAuthenticationToken(username, password);
+    public TokenResponseDTO autenticar (LoginDTO dto) {
+        var senhaUsuario = new UsernamePasswordAuthenticationToken(dto.login(), dto.senha());
         Authentication auth = authentication.authenticate(senhaUsuario);
         Usuario usuarioAutenticado =  (Usuario) auth.getPrincipal();
         String token = jwtUtil.generateToken(usuarioAutenticado);

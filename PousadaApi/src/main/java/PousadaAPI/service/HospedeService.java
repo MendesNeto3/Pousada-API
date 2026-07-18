@@ -1,14 +1,13 @@
 package PousadaAPI.service;
-import PousadaAPI.domain.exception.DadosInvalidosException;
 import PousadaAPI.domain.exception.HospedeNaoEncontradoException;
 import PousadaAPI.domain.exception.RegistroDuplicadoException;
 import PousadaAPI.domain.mapper.HospedeMapper;
-import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Hospede;
-import PousadaAPI.dto.dtoEntity.HospedeDTO;
-import PousadaAPI.dto.response.ResponseDto;
+import PousadaAPI.dto.request.CriarHospedeRequestDto;
+import PousadaAPI.dto.response.HospedeResponse;
 import PousadaAPI.dto.response.dtoHospedePesquisa;
 import PousadaAPI.repository.HospedeRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -28,23 +27,29 @@ public class HospedeService {
 
     private final HospedeRepository repository;
     private final HospedeMapper mapper;
-    private final ResponseMapper responseMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public Object salvarHospede(Hospede hospede) {
-        if (repository.existsByCpf(hospede.getCpf())) {
+    public Object salvarHospede(CriarHospedeRequestDto dto) {
+        if (repository.existsByCpf(dto.cpf())) {
             throw new RegistroDuplicadoException("Este CPF já foi cadastrado.");
-        } else if (repository.existsByEmail(hospede.getEmail())) {
+        } else if (repository.existsByEmail(dto.email())) {
             throw new RegistroDuplicadoException("Esté email já foi registrado.");
         }
-        return repository.save(hospede);
+        Hospede hospede = Hospede.builder()
+                .nome(dto.nome())
+                .email(dto.email())
+                .cpf(dto.cpf())
+                .telefone(dto.telefone())
+                .build();
+
+       return mapper.toResponse(repository.save(hospede));
     }
 
-    public ResponseDto buscarPorID(UUID id) {
+    public HospedeResponse buscarPorID(UUID id) {
         Hospede hospede = repository.findById(id)
                 .orElseThrow(() ->
                         new HospedeNaoEncontradoException("O Hospede não foi encontrado."));
-        return responseMapper.toResponse(hospede);
+        return mapper.toResponse(hospede);
     }
 
     public Object deletarHospede(UUID id) {
@@ -52,7 +57,7 @@ public class HospedeService {
                .orElseThrow(() ->
                        new HospedeNaoEncontradoException("O Hospede não foi encontrado."));
         repository.delete(hospede);
-        return responseMapper.toResponse(hospede);
+        return mapper.toResponse(hospede);
     }
 
     public List<Hospede> pesquisa(dtoHospedePesquisa filtros) {
@@ -77,12 +82,12 @@ public class HospedeService {
     public Object buscarPorNome(String nome) {
         return repository.findByNome(nome)
                 .filter(hospede -> hospede.getNome() != null && !hospede.getNome().isBlank())
-                .map(responseMapper::toResponse)
+                .map(mapper::toResponse)
                 .orElseThrow(() ->
                         new HospedeNaoEncontradoException("O hóspede não possui um nome válido ou não foi encontrado."));
     }
 
-    public ResponseDto atualizar(HospedeDTO dto, String id) {
+    public HospedeResponse atualizar(@Valid HospedeResponse dto, String id) {
        dto.validar();
         return repository
                 .findById(UUID.fromString(id))
@@ -93,16 +98,16 @@ public class HospedeService {
                     hospede.setEmail(dto.email());
                     return repository.save(hospede);
                 })
-                .map(responseMapper::toResponse)
+                .map(mapper::toResponse)
                 .orElseThrow(() ->
                         new HospedeNaoEncontradoException("O hóspede não foi encontrado."));
     }
 
-    public ResponseDto obterDetalhes(UUID id) {
+    public HospedeResponse obterDetalhes(UUID id) {
         Optional<Hospede> hospede = repository.findById(id);
         if (hospede.isEmpty()) {
             new HospedeNaoEncontradoException("Hospede não foi encontrado.");
         }
-        return responseMapper.toResponse(hospede.get());
+        return mapper.toResponse(hospede.get());
     }
 }

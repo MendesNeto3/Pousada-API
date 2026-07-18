@@ -2,9 +2,10 @@ package PousadaAPI.service;
 
 import PousadaAPI.domain.enums.StatusQuarto;
 import PousadaAPI.domain.exception.*;
+import PousadaAPI.domain.mapper.QuartoMapper;
 import PousadaAPI.domain.model.Quarto;
-import PousadaAPI.dto.dtoEntity.QuartoDTO;
 import PousadaAPI.dto.request.CriarQuartoRequestDto;
+import PousadaAPI.dto.response.QuartoResponse;
 import PousadaAPI.repository.QuartoRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +20,7 @@ import static java.math.BigDecimal.*;
 @AllArgsConstructor
 @Data
 public class QuartoService {
-
+    private final QuartoMapper quartoMapper;
     private final QuartoRepository repository;
 
     public Object cadastrarQuarto(CriarQuartoRequestDto dto) {
@@ -36,10 +37,10 @@ public class QuartoService {
         quarto.setPrecoNoite(dto.precoNoite());
         quarto.setStatus(StatusQuarto.disponivel);
 
-        return repository.save(quarto);
+        return quartoMapper.toResponse(repository.save(quarto));
     }
 
-    public Object atualizarStatusQuarto(QuartoDTO dto) {
+    public Object atualizarStatusQuarto(QuartoResponse dto) {
         Quarto quarto = repository.findById(dto.id())
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O quarto não foi encontrado"));
@@ -57,7 +58,7 @@ public class QuartoService {
             throw new QuartoIndisponivelException("O quarto " +dto.numero()+ "está com reserva ativa para esta data.");
         }
         quarto.setStatus(dto.statusQuarto());
-        return repository.save(quarto);
+        return quartoMapper.toResponse(repository.save(quarto));
     }
 
     public List<Quarto> listarDisponiveis (LocalDate Checkin, LocalDate Checkout) {
@@ -74,8 +75,7 @@ public class QuartoService {
         Quarto quarto = repository.findById(idQuarto)
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O quarto não foi encontrado"));
-        repository.delete(quarto);
-        return quarto;
+       return repository.deletar(quarto);
     }
 }
 

@@ -1,6 +1,5 @@
 package PousadaAPI.service;
 
-import PousadaAPI.Security.UserDetailService;
 import PousadaAPI.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -21,6 +21,8 @@ public interface QuartoRepository extends JpaRepository<Quarto, UUID> {
            """)
     List<Quarto> listarReservasAtivas(LocalDate inicio, LocalDate fim);
 
-    void delete (Quarto quarto);
+    Quarto deletar (Quarto quarto);
+
+
 
 }

@@ -1,8 +1,8 @@
 package PousadaAPI.domain.mapper;
 
 import PousadaAPI.domain.model.Quarto;
-import PousadaAPI.dto.dtoEntity.QuartoDTO;
 import PousadaAPI.dto.request.CriarQuartoRequestDto;
+import PousadaAPI.dto.response.QuartoResponse;
 import jakarta.validation.Valid;
 import org.mapstruct.Mapper;
 
@@ -11,5 +11,5 @@ public interface QuartoMapper {
 
     Quarto toEntity(@Valid CriarQuartoRequestDto quartoDTO);
 
-    QuartoDTO toDto(Quarto quarto);
+    QuartoResponse toResponse(Quarto quarto);
 }

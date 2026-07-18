@@ -4,7 +4,6 @@ import PousadaAPI.domain.enums.StatusQuarto;
 import PousadaAPI.domain.enums.StatusReserva;
 import PousadaAPI.domain.exception.*;
 import PousadaAPI.domain.mapper.ReservaMapper;
-import PousadaAPI.domain.mapper.ResponseMapper;
 import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Quarto;
@@ -27,7 +26,6 @@ public class ReservaService {
     private final ReservaRepository repositoryR;
     private final HospedeRepository repositoryH;
     private final ReservaMapper mapper;
-    private final ResponseMapper responseMapper;
     private final QuartoRepository repositoryQ;
     private final PagamentoRepository pagamentoRepository;
     
@@ -50,7 +48,7 @@ public class ReservaService {
         Reserva reserva = mapper.toEntity(dto, hospede, quarto);
         reserva = repositoryR.save(reserva);
 
-        return responseMapper.toDto(reserva);
+        return mapper.toResponse(reserva);
     }
 
     public Object realizarCheckin (Reserva reserva) {
@@ -68,7 +66,7 @@ public class ReservaService {
         reserva.setStatusReserva(StatusReserva.checkin_realizado);
         reserva.setStatus(StatusQuarto.ocupado);
 
-        return responseMapper.toDto(repositoryR.save(reservaId));
+        return mapper.toResponse(repositoryR.save(reservaId));
     }
 
     public Object realizarCheckOut (Reserva reserva) {
@@ -89,7 +87,7 @@ public class ReservaService {
                     ("Não é possívfel realizar o checkout, existe um valor em aberto.");
         }
         reserva.setStatusReserva(StatusReserva.checkout_realizado);
-        return responseMapper.toDto(repositoryR.save(reservaid));
+        return mapper.toResponse(repositoryR.save(reserva));
     }
 }
 

@@ -1,9 +1,10 @@
 package PousadaAPI.service;
-import PousadaAPI.domain.enums.MetodoPagamento;
 import PousadaAPI.domain.enums.StatusPagamento;
+import PousadaAPI.domain.exception.PagamentoDentroDoPrazoException;
 import PousadaAPI.domain.exception.PagamentoNaoEncontradoException;
 import PousadaAPI.domain.exception.ReservaNaoEncontradaException;
-import PousadaAPI.domain.mapper.ResponseMapper;
+import PousadaAPI.domain.mapper.PagamentoMapper;
+import PousadaAPI.domain.mapper.ReservaMapper;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.repository.PagamentoRepository;
@@ -12,10 +13,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,15 +24,16 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final ReservaRepository reservaRepository;
-    private final ResponseMapper  responseMapper;
+    private final ReservaMapper reservaMapper;
+    private final PagamentoMapper pagamentoMapper;
 
-    public Pagamento registrarPagamento (String id) {
+    public Pagamento registrarPagamento(String id) {
         var idPagamento = UUID.fromString(id);
         Pagamento pagamento = pagamentoRepository
                 .findById(idPagamento)
                 .orElseThrow(()
                         -> new PagamentoNaoEncontradoException("O pagamento não foi encontrado."));
-        Pagamento pagamentoDTO = responseMapper.toDTO(pagamento);
+        Pagamento pagamentoDTO = pagamentoMapper.toResponse(pagamento);
         if (pagamento.getStatusPagamento().equals(StatusPagamento.cancelado)) {
             throw new PagamentoNaoEncontradoException("O pagamento não pode ser concluído, pois foi cancelado.");
         }
@@ -57,9 +58,9 @@ public class PagamentoService {
         return pagamentoRepository.save(pagamentoDTO);
     }
 
-    public BigDecimal CalcularSaldoAberto (String reservaId) {
+    public BigDecimal CalcularSaldoAberto(String reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
         BigDecimal pagamentoTotal = pagamentoRepository
                 .findByStatusPagamento(StatusPagamento.aprovado)
@@ -70,15 +71,28 @@ public class PagamentoService {
         return reserva.getValorTotal().subtract(pagamentoTotal);
     }
 
-    public Object excluirPagamento (String reservaId) {
+    public Pagamento cancelarPagamentoExpirado (String reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
-        return responseMapper.toDto(reserva);
+        Pagamento pagamento = pagamentoRepository.findByReserva(reserva);
+
+        LocalDateTime DataPagamento = LocalDateTime.now();
+        LocalDateTime tempoLimite = LocalDateTime.now().minusMinutes(10);
+
+        if (DataPagamento.isAfter(tempoLimite)) {
+            PagamentoRepository.deletarPagamentosExpirados(pagamento);
+        } else {
+            throw new PagamentoDentroDoPrazoException("Ainda dentro do prazo.");
+        }
+        return pagamento;
     }
-    public List<Pagamento> listaPagamento(String reservaId, StatusPagamento  statusPagamento) {
+
+    public List<Object> listaPagamento(Pagamento pagamento) {
         return pagamentoRepository
-                .findByReservaIdAndStatusPagamento
-                        (reservaId, statusPagamento.equals(StatusPagamento.aprovado));
+                .findByPagamento(pagamento.getId())
+                .stream()
+                .filter(p -> pagamento.getStatusPagamento().equals(StatusPagamento.aprovado))
+                .toList();
     }
 }
