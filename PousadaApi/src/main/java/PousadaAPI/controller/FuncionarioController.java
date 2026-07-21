@@ -3,6 +3,7 @@ package PousadaAPI.controller;
 import PousadaAPI.config.URIConfig;
 import PousadaAPI.domain.model.Funcionario;
 import PousadaAPI.dto.request.CriarFuncionarioRequestDTO;
+import PousadaAPI.dto.response.FuncionarioResponse;
 import PousadaAPI.service.FuncionarioService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class FuncionarioController {
 
     @PostMapping("/cadastro")
     public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid CriarFuncionarioRequestDTO funcionarioRequestDTO) {
-        Funcionario funcionario = funcionarioService.cadastrarFuncionario(funcionarioRequestDTO);
+        FuncionarioResponse funcionario = funcionarioService.cadastrarFuncionario(funcionarioRequestDTO);
         var config = uriConfig.criarUriLocation(funcionario);
         return ResponseEntity.created(config).build();
     }
@@ -39,7 +40,7 @@ public class FuncionarioController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Funcionario> atualizarDados
+    public ResponseEntity<FuncionarioResponse> atualizarDados
             (@PathVariable ("id") String id,
              @RequestBody CriarFuncionarioRequestDTO funcionarioRequestDTO) {
         return ResponseEntity.ok(funcionarioService.atualizarDadosFuncionario(funcionarioRequestDTO, id));

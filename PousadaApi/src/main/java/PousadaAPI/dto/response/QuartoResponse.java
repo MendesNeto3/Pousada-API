@@ -9,9 +9,9 @@ import java.util.UUID;
 public record QuartoResponse(
         UUID id,
         short numero,
-        TipoQuarto tipoQuarto,
-        StatusQuarto statusQuarto,
+        TipoQuarto tipo,
+        StatusQuarto status,
         Short capacidade,
-        BigDecimal precNoite
+        BigDecimal precoNoite
 ) {
 }

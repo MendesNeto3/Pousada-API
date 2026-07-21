@@ -6,24 +6,24 @@ import PousadaAPI.domain.model.Reserva;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
 public interface PagamentoRepository extends JpaRepository<Pagamento, UUID> {
+
+    Pagamento findByReserva(Reserva reserva);
+
+    List<Pagamento> findByReservaId(String reservaId);
+
+    List<Pagamento> findByStatusPagamento(StatusPagamento statusPagamento);
 
     @Modifying
     @Transactional
-    static void deletarPagamentosExpirados(Pagamento tempoLimite) {
-    }
-    List<Pagamento> findByReservaId(String reservaId);
-    List<Pagamento> findByStatusPagamento(StatusPagamento statusPagamento);
-    List<Pagamento> findByReservaIdAndStatusPagamento(String reservaId, boolean status);
-    @Override
-    Optional<Pagamento> findById(UUID uuid);
-    Pagamento findByReserva (Reserva reserva);
+    @Query("DELETE FROM Pagamento p WHERE p.dataGeracao < :tempoLimite")
+    void deletarPagamentosExpirados(@Param("tempoLimite") Pagamento tempoLimite);
 
     Collection<Object> findByPagamento(UUID id);
 }

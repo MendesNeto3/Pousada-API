@@ -8,26 +8,21 @@ import PousadaAPI.dto.response.HospedeResponse;
 import PousadaAPI.dto.response.dtoHospedePesquisa;
 import PousadaAPI.repository.HospedeRepository;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
-@Data
-@Slf4j
+@RequiredArgsConstructor
 public class HospedeService {
 
     private final HospedeRepository repository;
     private final HospedeMapper mapper;
-    private final PasswordEncoder passwordEncoder;
 
     public Object salvarHospede(CriarHospedeRequestDto dto) {
         if (repository.existsByCpf(dto.cpf())) {
@@ -37,7 +32,7 @@ public class HospedeService {
         }
         Hospede hospede = Hospede.builder()
                 .nome(dto.nome())
-                .email(dto.email())
+                .email((dto.email()))
                 .cpf(dto.cpf())
                 .telefone(dto.telefone())
                 .build();
@@ -88,7 +83,7 @@ public class HospedeService {
     }
 
     public HospedeResponse atualizar(@Valid HospedeResponse dto, String id) {
-       dto.validar();
+        dto.validar();
         return repository
                 .findById(UUID.fromString(id))
                 .map(hospede -> {

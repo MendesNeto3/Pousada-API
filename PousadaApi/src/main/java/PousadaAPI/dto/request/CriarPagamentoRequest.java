@@ -11,11 +11,10 @@ public record CriarPagamentoRequest(
         @NotNull(message = "ID da reserva é obrigatório.")
         UUID reservaId,
 
+        @NotNull(message = "O método de pagamento é obrigatório.")
+        MetodoPagamento metodoPagamento,
+
         @NotNull(message = "O valor do pagamento é obrigatório.")
         @Positive(message = "O valor deve ser positivo.")
-        BigDecimal valor,
-
-        @NotNull(message = "O método de pagamento é obrigatório.")
-        MetodoPagamento pagamento
-) {
-}
+        BigDecimal valor
+) {}

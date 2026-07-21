@@ -15,7 +15,6 @@ import java.net.URI;
 @RestController
 @AllArgsConstructor
 public class ReservaController {
-
     private final ReservaMapper mapper;
     private final ReservaService service;
     private final URIConfig config;
@@ -23,8 +22,7 @@ public class ReservaController {
     @PostMapping
     public ResponseEntity<Object> criarReserva(@RequestBody @Valid CriarReservasRequestDto dto) {
         Reserva reservaSalva = (Reserva) service.criarReserva(dto);
-        ReservasResumoDTO respostaDto = mapper.toResponse(reservaSalva);
-        URI location = config.criarUriLocation(respostaDto);
+        URI location = config.criarUriLocation(reservaSalva);
         return ResponseEntity.created(location).build();
       }
 
@@ -38,5 +36,11 @@ public class ReservaController {
     public ResponseEntity<Object> realizarCheckout (@RequestBody @Valid Reserva reserva) {
         ReservasResumoDTO checkin = (ReservasResumoDTO) service.realizarCheckOut(reserva);
         return ResponseEntity.ok(checkin);
+    }
+
+    @PatchMapping("/cancelamento")
+    public ResponseEntity<Object> realizarCancelamento(@RequestBody @Valid String id) {
+        Reserva reservaCancelada = service.cancelarReserva(id);
+        return ResponseEntity.ok(reservaCancelada);
     }
 }

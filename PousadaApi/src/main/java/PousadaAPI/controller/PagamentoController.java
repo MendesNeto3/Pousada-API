@@ -1,7 +1,6 @@
 package PousadaAPI.controller;
 
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.enums.StatusPagamento;
 import PousadaAPI.domain.mapper.PagamentoMapper;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.service.PagamentoService;
@@ -27,29 +26,25 @@ public class PagamentoController {
     @PostMapping
     public ResponseEntity<Pagamento> registrarPagamento (@RequestBody @Valid String ReservaId) {
         Pagamento pagamento = pagamentoService.registrarPagamento(ReservaId);
-        Pagamento responseDto = pagamentoMapper.toResponse(pagamento);
-        URI location = config.criarUriLocation(responseDto);
+        URI location = config.criarUriLocation(pagamento);
         return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/calcular")
-    public ResponseEntity<Pagamento> calcularSaldoAberto (@RequestParam @Valid String ReservaId) {
+    public ResponseEntity<BigDecimal> calcularSaldoAberto (@RequestParam @Valid String ReservaId) {
         BigDecimal saldoAberto = pagamentoService.CalcularSaldoAberto(ReservaId);
-        Pagamento responseDTO = pagamentoMapper.toResponse(saldoAberto);
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(saldoAberto);
     }
 
     @DeleteMapping
     public ResponseEntity<Pagamento> cancelarPagamento (@RequestBody @Valid String ReservaId) {
         Pagamento pagamento = pagamentoService.cancelarPagamentoExpirado(ReservaId);
-        Pagamento responseDto = pagamentoMapper.toResponse(pagamento);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok(pagamento);
     }
 
     @GetMapping("/pagamentosLista")
     public ResponseEntity<List<Object>> listaPagamentos (
-            @RequestParam @Valid Pagamento pagamento,
-            @RequestParam @Valid StatusPagamento saldoStatus) {
+            @RequestParam @Valid Pagamento pagamento){
         return ResponseEntity.ok(pagamentoService.listaPagamento(pagamento));
     }
 }

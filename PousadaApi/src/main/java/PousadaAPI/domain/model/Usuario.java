@@ -1,11 +1,9 @@
+
 package PousadaAPI.domain.model;
 
 import PousadaAPI.domain.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,14 +11,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
 @Entity
-@Table(name = "usuários")
-@Data
+@Table(name = "usuarios") // Evite acentos em tabelas
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -34,12 +33,13 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default // Resolve o warning do Lombok
     @Column(nullable = false)
     private boolean ativo = true;
 
+    @Builder.Default // Resolve o warning do Lombok
     @Column(nullable = false)
-    private  boolean bloqueado = false;
-
+    private boolean bloqueado = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

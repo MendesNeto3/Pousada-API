@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -32,4 +33,7 @@ public class Pagamento {
     @Enumerated(EnumType.STRING)
     @Column(name = "status_pagamento",length = 20)
     private StatusPagamento statusPagamento;
+
+    @Column(name = "data_geracao", nullable = false, updatable = false)
+    private LocalDateTime dataGeracao;
 }

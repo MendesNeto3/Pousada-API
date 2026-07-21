@@ -57,7 +57,7 @@ public class QuartoService {
         if (quarto.getStatus()  == StatusQuarto.reservado) {
             throw new QuartoIndisponivelException("O quarto " +dto.numero()+ "está com reserva ativa para esta data.");
         }
-        quarto.setStatus(dto.statusQuarto());
+        quarto.setStatus(dto.status());
         return quartoMapper.toResponse(repository.save(quarto));
     }
 
@@ -75,7 +75,8 @@ public class QuartoService {
         Quarto quarto = repository.findById(idQuarto)
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O quarto não foi encontrado"));
-       return repository.deletar(quarto);
+        repository.delete(quarto);
+        return quarto;
     }
 }
 

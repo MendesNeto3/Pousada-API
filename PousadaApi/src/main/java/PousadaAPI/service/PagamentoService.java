@@ -33,7 +33,6 @@ public class PagamentoService {
                 .findById(idPagamento)
                 .orElseThrow(()
                         -> new PagamentoNaoEncontradoException("O pagamento não foi encontrado."));
-        Pagamento pagamentoDTO = pagamentoMapper.toResponse(pagamento);
         if (pagamento.getStatusPagamento().equals(StatusPagamento.cancelado)) {
             throw new PagamentoNaoEncontradoException("O pagamento não pode ser concluído, pois foi cancelado.");
         }
@@ -53,9 +52,8 @@ public class PagamentoService {
         if (totalAtual.compareTo(reserva.getValorTotal()) > 0) {
             throw new PagamentoNaoEncontradoException("O pagamento não foi concluído");
         }
-        pagamentoDTO.setStatusPagamento(StatusPagamento.aprovado);
-
-        return pagamentoRepository.save(pagamentoDTO);
+        pagamento.setStatusPagamento(StatusPagamento.aprovado);
+        return pagamentoRepository.save(pagamento);
     }
 
     public BigDecimal CalcularSaldoAberto(String reservaId) {
@@ -81,7 +79,7 @@ public class PagamentoService {
         LocalDateTime tempoLimite = LocalDateTime.now().minusMinutes(10);
 
         if (DataPagamento.isAfter(tempoLimite)) {
-            PagamentoRepository.deletarPagamentosExpirados(pagamento);
+            pagamentoRepository.deletarPagamentosExpirados(pagamento);
         } else {
             throw new PagamentoDentroDoPrazoException("Ainda dentro do prazo.");
         }

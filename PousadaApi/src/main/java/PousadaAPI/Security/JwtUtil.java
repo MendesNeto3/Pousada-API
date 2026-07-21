@@ -1,35 +1,39 @@
 package PousadaAPI.Security;
-
 import PousadaAPI.domain.model.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
-public class JwtUtil  {
+public class JwtUtil {
 
-    private final String secretKey = "123457-891020";
+    @Value("${api.security.token.secret}")
+    private  String secretKey;
 
-    public String generateToken(Usuario username) {
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateToken(Usuario usuario) {
         return Jwts.builder()
-                .setSubject(username.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+                .subject(usuario.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expira em 1 hora
+                .signWith(getSigningKey())
                 .compact();
-}
+    }
+
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public String extractUsername(String token) {
@@ -40,10 +44,8 @@ public class JwtUtil  {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
-    public boolean validateToken (String token, String username) {
-        final String extractedUsername =  extractUsername(token);
+    public boolean validateToken(String token, String username) {
+        final String extractedUsername = extractUsername(token);
         return extractedUsername.equals(username) && !isTokenExpired(token);
     }
-
-
-    }
+}

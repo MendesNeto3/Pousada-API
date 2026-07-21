@@ -18,3 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+api:
+  security:
+    token:
+      secret: "c3VwZXItc2VjcmV0LWtleS1wb3VzYWRhLWFwaS0yMDI2LXNlY3VyZS1oYXNoLWp3dA=="

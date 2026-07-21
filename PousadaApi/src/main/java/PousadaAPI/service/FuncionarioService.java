@@ -6,27 +6,28 @@ import PousadaAPI.domain.mapper.FuncionarioMapper;
 import PousadaAPI.domain.model.Funcionario;
 import PousadaAPI.domain.model.Usuario;
 import PousadaAPI.dto.request.CriarFuncionarioRequestDTO;
+import PousadaAPI.dto.response.FuncionarioResponse;
 import PousadaAPI.repository.FuncionarioRepository;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Data
 public class FuncionarioService {
 
-    private FuncionarioRepository funcionarioRepository;
-    private BCryptPasswordEncoder passwordEncoder;
-    private FuncionarioMapper mapper;
+    private final FuncionarioRepository funcionarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final FuncionarioMapper mapper;
 
-    public Funcionario cadastrarFuncionario (CriarFuncionarioRequestDTO dto) {
+    public FuncionarioResponse cadastrarFuncionario (CriarFuncionarioRequestDTO dto) {
         if (funcionarioRepository.existsByEmail(dto.email())) {
             throw new RegistroDuplicadoException("Já existe um funcionário com este email");
         }
@@ -49,8 +50,7 @@ public class FuncionarioService {
                 .usuario(usuario)
                 .build();
 
-        return funcionarioRepository.save(funcionario);
-
+        return mapper.toResponse(funcionarioRepository.save(funcionario));
     }
 
     public Funcionario deletarFuncionario (String id) {
@@ -59,7 +59,8 @@ public class FuncionarioService {
                 .findById(funcionarioId)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Funcionário não existente."));
-        return funcionarioRepository.deletar(funcionario);
+         funcionarioRepository.delete(funcionario);
+        return funcionario;
     }
 
     public List<Funcionario> listarFuncionario(String email, String nome) {
@@ -78,7 +79,7 @@ public class FuncionarioService {
         return funcionarioRepository.findAll(example);
     }
 
-    public Funcionario atualizarDadosFuncionario (CriarFuncionarioRequestDTO dto, String  id) {
+    public FuncionarioResponse atualizarDadosFuncionario (CriarFuncionarioRequestDTO dto, String  id) {
        return funcionarioRepository
                .findById(UUID.fromString(id))
                .map(f -> {

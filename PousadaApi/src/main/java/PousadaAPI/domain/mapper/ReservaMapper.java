@@ -8,24 +8,20 @@ import PousadaAPI.dto.response.ReservasResumoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
-@Mapper(componentModel = "spring",
-        uses = {
-                HospedeMapper.class,
-                QuartoMapper.class
-        }
-)
+@Mapper(componentModel = "spring")
 public interface ReservaMapper {
-    @Mapping(target = "id",   ignore = true)
-    @Mapping(target = "checkin",      source = "dto.checkin")
-    @Mapping(target = "checkout",     source = "dto.checkout")
-    @Mapping(target = "hospede",      source = "hospede")
-    @Mapping(target = "quarto",       source = "quarto")
-    @Mapping(target = "funcionario",  ignore = true)
-    @Mapping(target = "valorTotal",   ignore = true)
-    @Mapping(target = "status",       source = "dto.status")
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "checkin", source = "dto.checkin")
+    @Mapping(target = "checkout", source = "dto.checkout")
+    @Mapping(target = "hospede", source = "hospede")
+    @Mapping(target = "quarto", source = "quarto")
+    @Mapping(target = "funcionario", ignore = true)
+    @Mapping(target = "valorTotal", ignore = true)
+    @Mapping(target = "status", source = "dto.status")
+    @Mapping(target = "statusReserva", ignore = true)
     Reserva toEntity(CriarReservasRequestDto dto, Hospede hospede, Quarto quarto);
 
-    ReservasResumoDTO toResponse (Reserva reservaSalva);
+    ReservasResumoDTO toResponse(Reserva reservaSalva);
 
 }
