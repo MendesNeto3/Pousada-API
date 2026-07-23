@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-@Controller
 @RestController
 @RequestMapping("/autentication")
 @AllArgsConstructor
@@ -21,7 +19,7 @@ public class AutenticationController {
     private final AutenticationService autenticationService;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login (@RequestBody @Valid LoginDTO dto)  {
+    public ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginDTO dto) {
         TokenResponseDTO response = autenticationService.autenticar(dto);
         return ResponseEntity.ok(response);
     }

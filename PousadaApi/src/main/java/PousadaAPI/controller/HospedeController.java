@@ -1,6 +1,6 @@
 package PousadaAPI.controller;
+
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.mapper.HospedeMapper;
 import PousadaAPI.domain.model.Hospede;
 import PousadaAPI.dto.request.CriarHospedeRequestDto;
 import PousadaAPI.dto.response.HospedeResponse;
@@ -14,50 +14,49 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/hospede")
 @RestController
+@RequestMapping("/hospede")
 @AllArgsConstructor
-public class HospedeController { 
+public class HospedeController {
+
     private final HospedeService service;
     private final URIConfig config;
 
     @PostMapping
-    public ResponseEntity<HospedeResponse> cadastrarHospede(@RequestBody @Valid CriarHospedeRequestDto dto) {
-         HospedeResponse salvo = service.salvarHospede(dto);
-         URI location = config.criarUriLocation(salvo);
-         return ResponseEntity.created(location).build();
+    public ResponseEntity<Void> cadastrarHospede(@RequestBody @Valid CriarHospedeRequestDto dto) {
+        HospedeResponse salvo = service.salvarHospede(dto);
+        URI location = config.criarUriLocation(salvo);
+        return ResponseEntity.created(location).build();
     }
 
-    @GetMapping("/buscar")
-    public ResponseEntity<HospedeResponse> procurarPorNome(@PathVariable String nome) {
+    @GetMapping("/buscar/{nome}")
+    public ResponseEntity<HospedeResponse> procurarPorNome(@PathVariable("nome") String nome) {
         HospedeResponse hospede = service.buscarPorNome(nome);
         return ResponseEntity.ok(hospede);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Object> procurarPorID(@PathVariable("id") String id) {
-        var idHospede = UUID.fromString(id);
-        HospedeResponse hospede = service.buscarPorID(idHospede);
+    @GetMapping("/{id}")
+    public ResponseEntity<HospedeResponse> procurarPorID(@PathVariable("id") UUID id) {
+        HospedeResponse hospede = service.buscarPorID(id);
         return ResponseEntity.ok(hospede);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Object> deletarHospede(@PathVariable("id") String id) {
-        var idHospede = UUID.fromString(id);
-        Object hospedeDeletado = service.deletarHospede(idHospede);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deletarHospede(@PathVariable("id") UUID id) {
+        Object hospedeDeletado = service.deletarHospede(id);
         return ResponseEntity.ok(hospedeDeletado);
     }
 
     @GetMapping
-    public ResponseEntity<List<Hospede>> pesquisa
-            (@RequestParam(value = "filtros", required = false) dtoHospedePesquisa filtros) {
+    public ResponseEntity<List<Hospede>> pesquisa(@ModelAttribute dtoHospedePesquisa filtros) {
         return ResponseEntity.ok(service.pesquisa(filtros));
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<HospedeResponse> atualizar (
-            @PathVariable("id") String id, @RequestBody @Valid HospedeResponse dto) {
-        var responseAtualizado = service.atualizar(dto, id);
+    @PutMapping("/{id}")
+    public ResponseEntity<HospedeResponse> atualizar(
+            @PathVariable("id") String id,
+            @RequestBody @Valid HospedeResponse dto) {
+        HospedeResponse responseAtualizado = service.atualizar(dto, id);
         return ResponseEntity.ok(responseAtualizado);
     }
 
@@ -67,4 +66,3 @@ public class HospedeController {
         return ResponseEntity.ok(dto);
     }
 }
-

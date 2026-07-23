@@ -32,7 +32,7 @@ public class ReservaService {
     private final QuartoRepository repositoryQ;
     private final PagamentoRepository pagamentoRepository;
 
-    public ReservasResumoDTO criarReserva(CriarReservasRequestDto dto) {
+    public ReservasResumoDTO criarReserva( @Valid CriarReservasRequestDto dto) {
         Hospede hospede = repositoryH.findById(dto.hospedeId())
                 .orElseThrow(() ->
                         new HospedeNaoEncontradoException("Hóspede não foi encontrado"));
@@ -53,8 +53,8 @@ public class ReservaService {
         return mapper.toResponse(repositoryR.save(reserva));
     }
 
-    public Object realizarCheckin(Reserva reserva) {
-        Reserva reservaId = repositoryR.findById(reserva.getId())
+    public ReservasResumoDTO realizarCheckin( UUID id) {
+        Reserva reservaId = repositoryR.findById(id)
                 .orElseThrow(()
                         -> new ReservaNaoEncontradaException
                         ("A reserva com este respectivo identificador não foi encontrada"));
@@ -62,11 +62,11 @@ public class ReservaService {
         if (reservaId.getStatusReserva() != StatusReserva.confirmada) {
             throw new ReservaJaRealizadaException("Check-in não permitido.");
         }
-        if (LocalDate.now().isBefore(reserva.getCheckin())) {
+        if (LocalDate.now().isBefore(reservaId.getCheckin())) {
             throw new CheckinAntecipadoException("Não é permitido check-in antecipado.");
         }
-        reserva.setStatusReserva(StatusReserva.checkin_realizado);
-        reserva.setStatus(StatusQuarto.ocupado);
+        reservaId.setStatusReserva(StatusReserva.checkin_realizado);
+        reservaId.setStatus(StatusQuarto.ocupado);
 
         return mapper.toResponse(repositoryR.save(reservaId));
     }

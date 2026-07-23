@@ -85,11 +85,11 @@ public class PagamentoService {
         return null;
     }
 
-    public List<Object> listaPagamento(PagamentoResponse pagamento) {
+    public List<Object> listaPagamento(PagamentoResponse pagamentoResponse) {
         return pagamentoRepository
-                .findByPagamento(pagamento.id())
+                .findByPagamento(pagamentoResponse.id())
                 .stream()
-                .filter(p -> pagamento.statusPagamento().equals(StatusPagamento.aprovado))
+                .filter(p -> pagamentoResponse.statusPagamento().equals(StatusPagamento.aprovado))
                 .toList();
     }
 }

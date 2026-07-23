@@ -53,14 +53,14 @@ public class FuncionarioService {
         return mapper.toResponse(funcionarioRepository.save(funcionario));
     }
 
-    public Funcionario deletarFuncionario (String id) {
+    public FuncionarioResponse deletarFuncionario (String id) {
         var funcionarioId = UUID.fromString(id);
         Funcionario funcionario = funcionarioRepository
                 .findById(funcionarioId)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Funcionário não existente."));
          funcionarioRepository.delete(funcionario);
-        return funcionario;
+         return mapper.toResponse(funcionario);
     }
 
     public List<Funcionario> listarFuncionario(String email, String nome) {

@@ -1,7 +1,8 @@
 package PousadaAPI.controller;
 
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.mapper.PagamentoMapper;
+
+import PousadaAPI.dto.request.CriarHospedeRequestDto;
 import PousadaAPI.dto.request.CriarPagamentoRequest;
 import PousadaAPI.dto.response.PagamentoResponse;
 import PousadaAPI.service.PagamentoService;
@@ -10,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
@@ -20,11 +20,8 @@ import java.util.UUID;
 @RestController
 @AllArgsConstructor
 public class PagamentoController {
-
     private final PagamentoService pagamentoService;
-    private final PagamentoMapper pagamentoMapper;
     private final URIConfig config;
-
 
     @PostMapping
     public ResponseEntity<PagamentoResponse> registrarPagamento(@RequestBody @Valid CriarPagamentoRequest request) {
@@ -34,20 +31,18 @@ public class PagamentoController {
     }
 
     @GetMapping("/calcular")
-    public ResponseEntity<BigDecimal> calcularSaldoAberto (@RequestParam @Valid UUID ReservaId) {
-        BigDecimal saldoAberto = pagamentoService.CalcularSaldoAberto(ReservaId);
+    public ResponseEntity<BigDecimal> calcularSaldoAberto(@RequestParam("reservaId")UUID reservaId) {
+        BigDecimal saldoAberto = pagamentoService.CalcularSaldoAberto(reservaId);
         return ResponseEntity.ok(saldoAberto);
     }
 
     @DeleteMapping("/{reservaId}")
-    public ResponseEntity<PagamentoResponse> cancelarPagamentoExpirado(@PathVariable UUID reservaId) {
+    public ResponseEntity<PagamentoResponse> cancelarPagamentoExpirado(@PathVariable("reservaId") UUID reservaId) {
         PagamentoResponse response = pagamentoService.cancelarPagamentoExpirado(reservaId);
         return ResponseEntity.ok(response);
     }
-
     @GetMapping("/pagamentosLista")
-    public ResponseEntity<List<Object>> listaPagamentos (
-            @RequestParam @Valid PagamentoResponse pagamento){
-        return ResponseEntity.ok(pagamentoService.listaPagamento(pagamento));
+    public ResponseEntity<List<Object>> listaPagamentos(@ModelAttribute PagamentoResponse filtro) {
+        return ResponseEntity.ok(pagamentoService.listaPagamento(filtro));
     }
 }

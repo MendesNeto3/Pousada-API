@@ -1,7 +1,5 @@
 package PousadaAPI.controller;
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.mapper.ReservaMapper;
-import PousadaAPI.domain.model.Reserva;
 import PousadaAPI.dto.request.CriarReservasRequestDto;
 import PousadaAPI.dto.response.ReservasResumoDTO;
 import PousadaAPI.service.ReservaService;
@@ -10,12 +8,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
+import java.util.UUID;
 
 @RequestMapping("/reserva")
 @RestController
 @AllArgsConstructor
 public class ReservaController {
-    private final ReservaMapper mapper;
     private final ReservaService service;
     private final URIConfig config;
 
@@ -26,20 +24,20 @@ public class ReservaController {
         return ResponseEntity.created(location).build();
       }
 
-    @PatchMapping("/checkin")
-    public ResponseEntity<Object> realizarCheckin(@RequestBody @Valid Reserva reserva) {
-        ReservasResumoDTO checkin = (ReservasResumoDTO) service.realizarCheckin(reserva);
+    @PatchMapping("/{id}/checkin")
+    public ResponseEntity<ReservasResumoDTO> realizarCheckin(@PathVariable("id") UUID id) {
+        ReservasResumoDTO checkin =  service.realizarCheckin(id);
         return ResponseEntity.ok(checkin);
     }
 
-    @PatchMapping("/checkout")
-    public ResponseEntity<Object> realizarCheckout (@RequestBody @Valid Reserva reserva) {
-        ReservasResumoDTO checkin = service.realizarCheckOut(reserva.getId());
+    @PatchMapping("/{id}/checkout")
+    public ResponseEntity<ReservasResumoDTO> realizarCheckout (@PathVariable("id") UUID id) {
+        ReservasResumoDTO checkin = service.realizarCheckOut(id);
         return ResponseEntity.ok(checkin);
     }
 
-    @PatchMapping("/cancelamento")
-    public ResponseEntity<ReservasResumoDTO> realizarCancelamento(@RequestBody @Valid String id) {
+    @PatchMapping("/{id}/cancelamento")
+    public ResponseEntity<ReservasResumoDTO> realizarCancelamento(@PathVariable("id") @Valid String id) {
         ReservasResumoDTO reservaCancelada = service.cancelarReserva(id);
         return ResponseEntity.ok(reservaCancelada);
     }
