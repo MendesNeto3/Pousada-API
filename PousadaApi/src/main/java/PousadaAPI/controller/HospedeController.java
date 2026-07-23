@@ -19,20 +19,19 @@ import java.util.UUID;
 @AllArgsConstructor
 public class HospedeController { 
     private final HospedeService service;
-    private final HospedeMapper mapper;
     private final URIConfig config;
 
     @PostMapping
-    public ResponseEntity<Object> cadastrarHospede(@RequestBody @Valid CriarHospedeRequestDto dto) {
-         Hospede salvo = (Hospede) service.salvarHospede(dto);
+    public ResponseEntity<HospedeResponse> cadastrarHospede(@RequestBody @Valid CriarHospedeRequestDto dto) {
+         HospedeResponse salvo = service.salvarHospede(dto);
          URI location = config.criarUriLocation(salvo);
          return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<Object> procurarPorNome(@PathVariable String nome) {
-        Hospede hospede = (Hospede) service.buscarPorNome(nome);
-        return ResponseEntity.ok(mapper.toResponse(hospede));
+    public ResponseEntity<HospedeResponse> procurarPorNome(@PathVariable String nome) {
+        HospedeResponse hospede = service.buscarPorNome(nome);
+        return ResponseEntity.ok(hospede);
     }
 
     @GetMapping("{id}")

@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "reserva", schema = "public")
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospede_id", nullable = false)

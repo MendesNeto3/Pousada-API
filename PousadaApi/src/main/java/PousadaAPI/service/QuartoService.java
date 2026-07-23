@@ -23,7 +23,7 @@ public class QuartoService {
     private final QuartoMapper quartoMapper;
     private final QuartoRepository repository;
 
-    public Object cadastrarQuarto(CriarQuartoRequestDto dto) {
+    public QuartoResponse cadastrarQuarto(CriarQuartoRequestDto dto) {
         if (repository.findByNumero(dto.numero()).isPresent()) {
             throw new QuartoJaCadastradoException("O quarto com este número já foi cadastrado.");
         }
@@ -40,28 +40,28 @@ public class QuartoService {
         return quartoMapper.toResponse(repository.save(quarto));
     }
 
-    public Object atualizarStatusQuarto(QuartoResponse dto) {
-        Quarto quarto = repository.findById(dto.id())
+    public QuartoResponse atualizarStatusQuarto(CriarQuartoRequestDto request) {
+        Quarto quarto = repository.findByNumero(request.numero())
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O quarto não foi encontrado"));
 
         if (quarto.getStatus() == StatusQuarto.disponivel) {
-            throw new QuartoDisponivelException("O quarto " + dto.numero() + "está disponível");
+            throw new QuartoDisponivelException("O quarto " + request.numero() + "está disponível");
         }
         if (quarto.getStatus()  == StatusQuarto.ocupado) {
-            throw new QuartoIndisponivelException("O quarto" + dto.numero() + "está ocupado");
+            throw new QuartoIndisponivelException("O quarto" + request.numero() + "está ocupado");
         }
         if (quarto.getStatus()  == StatusQuarto.indisponivel) {
-            throw new QuartoIndisponivelException("O quarto" + dto.numero() + "o quarto está indisponível");
+            throw new QuartoIndisponivelException("O quarto" + request.numero() + "o quarto está indisponível");
         }
         if (quarto.getStatus()  == StatusQuarto.reservado) {
-            throw new QuartoIndisponivelException("O quarto " +dto.numero()+ "está com reserva ativa para esta data.");
+            throw new QuartoIndisponivelException("O quarto " +request.numero()+ "está com reserva ativa para esta data.");
         }
-        quarto.setStatus(dto.status());
+        quarto.setStatus(quarto.getStatus());
         return quartoMapper.toResponse(repository.save(quarto));
     }
 
-    public List<Quarto> listarDisponiveis (LocalDate Checkin, LocalDate Checkout) {
+    public List<QuartoResponse> listarDisponiveis (LocalDate Checkin, LocalDate Checkout) {
         if (Checkin.isAfter(Checkout)) {
             throw new DataInvalidaException(
                     "Check-in não pode ser efetuado depois do check-out"
@@ -70,13 +70,16 @@ public class QuartoService {
         return repository.listarReservasAtivas(Checkin, Checkout);
     }
 
-    public Quarto excluirQuarto (String id) {
-        var idQuarto = UUID.fromString(id);
+    public QuartoResponse excluirQuarto(String id) {
+        UUID idQuarto = UUID.fromString(id);
         Quarto quarto = repository.findById(idQuarto)
                 .orElseThrow(() ->
                         new QuartoNaoEncontradoException("O quarto não foi encontrado"));
+
+        QuartoResponse response = quartoMapper.toResponse(quarto);
         repository.delete(quarto);
-        return quarto;
+
+        return response;
     }
 }
 

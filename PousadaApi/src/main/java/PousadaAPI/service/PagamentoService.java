@@ -1,12 +1,14 @@
 package PousadaAPI.service;
 import PousadaAPI.domain.enums.StatusPagamento;
 import PousadaAPI.domain.exception.PagamentoDentroDoPrazoException;
-import PousadaAPI.domain.exception.PagamentoNaoEncontradoException;
 import PousadaAPI.domain.exception.ReservaNaoEncontradaException;
+import PousadaAPI.domain.exception.ValorQuartoInvalidoException;
 import PousadaAPI.domain.mapper.PagamentoMapper;
 import PousadaAPI.domain.mapper.ReservaMapper;
 import PousadaAPI.domain.model.Pagamento;
 import PousadaAPI.domain.model.Reserva;
+import PousadaAPI.dto.request.CriarPagamentoRequest;
+import PousadaAPI.dto.response.PagamentoResponse;
 import PousadaAPI.repository.PagamentoRepository;
 import PousadaAPI.repository.ReservaRepository;
 import lombok.AllArgsConstructor;
@@ -27,36 +29,33 @@ public class PagamentoService {
     private final ReservaMapper reservaMapper;
     private final PagamentoMapper pagamentoMapper;
 
-    public Pagamento registrarPagamento(String id) {
-        var idPagamento = UUID.fromString(id);
-        Pagamento pagamento = pagamentoRepository
-                .findById(idPagamento)
-                .orElseThrow(()
-                        -> new PagamentoNaoEncontradoException("O pagamento não foi encontrado."));
-        if (pagamento.getStatusPagamento().equals(StatusPagamento.cancelado)) {
-            throw new PagamentoNaoEncontradoException("O pagamento não pode ser concluído, pois foi cancelado.");
-        }
-        if (pagamento.getStatusPagamento().equals(StatusPagamento.aprovado)) {
-            throw new PagamentoNaoEncontradoException("O pagamento já foi aprovado anteriormente.");
-        }
-        Reserva reserva = pagamento.getReserva();
-        BigDecimal totalPago = pagamentoRepository
-                .findByReservaId(reserva.getId())
+    public PagamentoResponse registrarPagamento(CriarPagamentoRequest request) {
+        Reserva reserva = reservaRepository.findById(request.reservaId())
+                .orElseThrow(() -> new ReservaNaoEncontradaException("Reserva não encontrada."));
+
+        BigDecimal totalPago = pagamentoRepository.findByReservaId(reserva.getId() )
                 .stream()
-                .filter(p -> p.getStatusPagamento().equals(StatusPagamento.aprovado))
+                .filter(p -> p.getStatusPagamento() == StatusPagamento.aprovado)
                 .map(Pagamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalAtual = totalPago.add(pagamento.getValor());
+        BigDecimal totalAtual = totalPago.add(request.valor());
 
         if (totalAtual.compareTo(reserva.getValorTotal()) > 0) {
-            throw new PagamentoNaoEncontradoException("O pagamento não foi concluído");
+            throw new ValorQuartoInvalidoException("O valor ultrapassa o total da reserva.");
         }
-        pagamento.setStatusPagamento(StatusPagamento.aprovado);
-        return pagamentoRepository.save(pagamento);
+
+        Pagamento pagamento = Pagamento.builder()
+                .reserva(reserva)
+                .valor(request.valor())
+                .pagamento(request.metodoPagamento())
+                .statusPagamento(StatusPagamento.aprovado)
+                .build();
+
+        return pagamentoMapper.toResponse(pagamentoRepository.save(pagamento));
     }
 
-    public BigDecimal CalcularSaldoAberto(String reservaId) {
+    public BigDecimal CalcularSaldoAberto(UUID reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() ->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
@@ -69,28 +68,28 @@ public class PagamentoService {
         return reserva.getValorTotal().subtract(pagamentoTotal);
     }
 
-    public Pagamento cancelarPagamentoExpirado (String reservaId) {
+    public PagamentoResponse cancelarPagamentoExpirado (UUID reservaId) {
         Reserva reserva = reservaRepository.findById(reservaId)
                 .orElseThrow(() ->
                         new ReservaNaoEncontradaException("Reserva não encontrada."));
         Pagamento pagamento = pagamentoRepository.findByReserva(reserva);
 
-        LocalDateTime DataPagamento = LocalDateTime.now();
-        LocalDateTime tempoLimite = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime tempoLimite = pagamento.getDataGeracao().plusMinutes(10);
 
-        if (DataPagamento.isAfter(tempoLimite)) {
+        if (LocalDateTime.now().isAfter(tempoLimite)) {
             pagamentoRepository.deletarPagamentosExpirados(pagamento);
+            pagamentoMapper.toResponse(pagamento);
         } else {
             throw new PagamentoDentroDoPrazoException("Ainda dentro do prazo.");
         }
-        return pagamento;
+        return null;
     }
 
-    public List<Object> listaPagamento(Pagamento pagamento) {
+    public List<Object> listaPagamento(PagamentoResponse pagamento) {
         return pagamentoRepository
-                .findByPagamento(pagamento.getId())
+                .findByPagamento(pagamento.id())
                 .stream()
-                .filter(p -> pagamento.getStatusPagamento().equals(StatusPagamento.aprovado))
+                .filter(p -> pagamento.statusPagamento().equals(StatusPagamento.aprovado))
                 .toList();
     }
 }

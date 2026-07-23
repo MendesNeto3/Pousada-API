@@ -6,5 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = {ReservaMapper.class})
 public interface PagamentoMapper {
-    PagamentoResponse toResponse(Pagamento pagamento);
+
+    PagamentoResponse toResponse(Pagamento pagamentoResponse);
 }

@@ -20,8 +20,8 @@ public class ReservaController {
     private final URIConfig config;
 
     @PostMapping
-    public ResponseEntity<Object> criarReserva(@RequestBody @Valid CriarReservasRequestDto dto) {
-        Reserva reservaSalva = (Reserva) service.criarReserva(dto);
+    public ResponseEntity<ReservasResumoDTO> criarReserva(@RequestBody @Valid CriarReservasRequestDto dto) {
+        ReservasResumoDTO reservaSalva = service.criarReserva(dto);
         URI location = config.criarUriLocation(reservaSalva);
         return ResponseEntity.created(location).build();
       }
@@ -34,13 +34,13 @@ public class ReservaController {
 
     @PatchMapping("/checkout")
     public ResponseEntity<Object> realizarCheckout (@RequestBody @Valid Reserva reserva) {
-        ReservasResumoDTO checkin = (ReservasResumoDTO) service.realizarCheckOut(reserva);
+        ReservasResumoDTO checkin = service.realizarCheckOut(reserva.getId());
         return ResponseEntity.ok(checkin);
     }
 
     @PatchMapping("/cancelamento")
-    public ResponseEntity<Object> realizarCancelamento(@RequestBody @Valid String id) {
-        Reserva reservaCancelada = service.cancelarReserva(id);
+    public ResponseEntity<ReservasResumoDTO> realizarCancelamento(@RequestBody @Valid String id) {
+        ReservasResumoDTO reservaCancelada = service.cancelarReserva(id);
         return ResponseEntity.ok(reservaCancelada);
     }
 }

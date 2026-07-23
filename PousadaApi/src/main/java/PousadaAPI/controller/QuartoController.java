@@ -1,8 +1,6 @@
 package PousadaAPI.controller;
 
 import PousadaAPI.config.URIConfig;
-import PousadaAPI.domain.mapper.QuartoMapper;
-import PousadaAPI.domain.model.Quarto;
 import PousadaAPI.dto.request.CriarQuartoRequestDto;
 import PousadaAPI.dto.response.QuartoResponse;
 import PousadaAPI.service.QuartoService;
@@ -12,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -21,19 +17,18 @@ import java.util.stream.Collectors;
 public class QuartoController {
 
     private final QuartoService quartoService;
-    private final QuartoMapper quartoMapper;
     private final URIConfig  uriConfig;
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> cadastrarQuarto(
+    public ResponseEntity<QuartoResponse> cadastrarQuarto(
             @RequestBody @Valid CriarQuartoRequestDto quartoRequestDto) {
-         Quarto quarto = (Quarto) quartoService.cadastrarQuarto(quartoRequestDto);
+         QuartoResponse quarto =  quartoService.cadastrarQuarto(quartoRequestDto);
          URI location = uriConfig.criarUriLocation(quarto);
          return ResponseEntity.created(location).build();
     }
 
     @PatchMapping("/atualizar")
-    public ResponseEntity<Object> atualizarQuarto (@RequestBody @Valid QuartoResponse dto) {
+    public ResponseEntity<Object> atualizarQuarto (@RequestBody @Valid CriarQuartoRequestDto dto) {
         var responseAtualizado = quartoService.atualizarStatusQuarto(dto);
         return ResponseEntity.ok(responseAtualizado);
     }
@@ -43,18 +38,12 @@ public class QuartoController {
             @RequestParam(value = "checkin", required = false) LocalDate checkin,
             @RequestParam(value = "checkout", required = false) LocalDate checkout
     ) {
-        List<Quarto> quartoList = quartoService.listarDisponiveis(checkin, checkout);
-        List<QuartoResponse> dtoList = quartoList
-                .stream()
-                .map(quartoMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtoList);
+       return ResponseEntity.ok(quartoService.listarDisponiveis(checkin, checkout));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Object> deletarQuarto (@PathVariable String id) {
-        Quarto quarto = quartoService.excluirQuarto(id);
-        QuartoResponse responseQuarto = quartoMapper.toResponse(quarto);
-        return ResponseEntity.ok(responseQuarto);
+    public ResponseEntity<QuartoResponse> deletarQuarto (@PathVariable String id) {
+        QuartoResponse quarto = quartoService.excluirQuarto(id);
+        return ResponseEntity.ok(quarto);
     }
 }

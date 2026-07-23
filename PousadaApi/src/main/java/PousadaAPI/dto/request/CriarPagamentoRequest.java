@@ -17,4 +17,6 @@ public record CriarPagamentoRequest(
         @NotNull(message = "O valor do pagamento é obrigatório.")
         @Positive(message = "O valor deve ser positivo.")
         BigDecimal valor
+
+
 ) {}

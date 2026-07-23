@@ -16,7 +16,7 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, UUID> {
 
     Pagamento findByReserva(Reserva reserva);
 
-    List<Pagamento> findByReservaId(String reservaId);
+    List<Pagamento> findByReservaId(UUID reservaId);
 
     List<Pagamento> findByStatusPagamento(StatusPagamento statusPagamento);
 

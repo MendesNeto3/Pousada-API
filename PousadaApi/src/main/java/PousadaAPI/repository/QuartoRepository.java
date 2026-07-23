@@ -1,6 +1,7 @@
 package PousadaAPI.repository;
 
 import PousadaAPI.domain.model.Quarto;
+import PousadaAPI.dto.response.QuartoResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,10 +20,7 @@ public interface QuartoRepository extends JpaRepository<Quarto, UUID> {
            AND r.checkin >= :inicio
            AND r.checkout <= :fim
            """)
-    List<Quarto> listarReservasAtivas(LocalDate inicio, LocalDate fim);
-
-    void delete (Quarto quarto);
-
+    List<QuartoResponse> listarReservasAtivas(LocalDate inicio, LocalDate fim);
 
 
 }

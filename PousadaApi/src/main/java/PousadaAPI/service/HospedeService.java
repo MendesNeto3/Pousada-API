@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,7 @@ public class HospedeService {
     private final HospedeRepository repository;
     private final HospedeMapper mapper;
 
-    public Object salvarHospede(CriarHospedeRequestDto dto) {
+    public HospedeResponse salvarHospede(CriarHospedeRequestDto dto) {
         if (repository.existsByCpf(dto.cpf())) {
             throw new RegistroDuplicadoException("Este CPF já foi cadastrado.");
         } else if (repository.existsByEmail(dto.email())) {
@@ -47,8 +46,8 @@ public class HospedeService {
         return mapper.toResponse(hospede);
     }
 
-    public Object deletarHospede(UUID id) {
-       Hospede hospede = (Hospede) repository.findById(id)
+    public HospedeResponse deletarHospede(UUID id) {
+       Hospede hospede = repository.findById(id)
                .orElseThrow(() ->
                        new HospedeNaoEncontradoException("O Hospede não foi encontrado."));
         repository.delete(hospede);
@@ -74,7 +73,7 @@ public class HospedeService {
         return repository.findAll(example);
     }
 
-    public Object buscarPorNome(String nome) {
+    public HospedeResponse buscarPorNome(String nome) {
         return repository.findByNome(nome)
                 .filter(hospede -> hospede.getNome() != null && !hospede.getNome().isBlank())
                 .map(mapper::toResponse)
@@ -101,7 +100,7 @@ public class HospedeService {
     public HospedeResponse obterDetalhes(UUID id) {
         Optional<Hospede> hospede = repository.findById(id);
         if (hospede.isEmpty()) {
-            new HospedeNaoEncontradoException("Hospede não foi encontrado.");
+            throw new HospedeNaoEncontradoException("Hospede não foi encontrado.");
         }
         return mapper.toResponse(hospede.get());
     }
